@@ -1,0 +1,61 @@
+{
+  "short_name": "AI Insights",
+  "name": "AI Insights",
+  "description": "AI Insights allows users to analyze DHIS2 health data using natural language queries. Healthcare professionals, data analysts, and decision-makers can ask questions in plain language to identify trends, compare performance across organization units, and generate actionable insights from their data. The app works by connecting to external AI services (OpenAI or locally-hosted Ollama) to interpret questions and analyze aggregate, event, and tracker data. AI Insights is generic and works with any DHIS2 instance and metadata structure. The app requires an internet connection to communicate with AI services and may need API keys for OpenAI or local Ollama setup. All analysis happens through conversational interfaces that produce visualizations and downloadable reports.",
+  "icons": [
+    {
+      "src": "android-chrome-192x192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "android-chrome-384x384.png",
+      "type": "image/png",
+      "sizes": "384x384"
+    },
+    {
+      "src": "apple-touch-icon.png",
+      "type": "image/png",
+      "sizes": "180x180"
+    },
+    {
+      "src": "dhis2-app-icon.png",
+      "type": "image/png",
+      "sizes": "48x48"
+    },
+    {
+      "src": "favicon-16x16.png",
+      "sizes": "16x16",
+      "type": "image/png"
+    },
+    {
+      "src": "favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "favicon-48x48.png",
+      "sizes": "48x48",
+      "type": "image/png"
+    },
+    {
+      "src": "favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "mstile-150x150.png",
+      "sizes": "150x150",
+      "type": "image/png"
+    },
+    {
+      "src": "safari-pinned-tab.svg",
+      "sizes": "16x16",
+      "type": "image/svg+xml"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#ffffff",
+  "background_color": "#f4f6f8"
+}

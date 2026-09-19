@@ -1,0 +1,34 @@
+._container_ckyqn_1 {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    font-size: 1rem
+}
+
+._flexGrow_1g9u8_1 {
+    flex-grow: 1
+}
+
+._marginBottom_1g9u8_5 {
+    margin-block-end:8px}
+
+._link_1g9u8_9 {
+    color: var(--colors-grey800)
+}
+
+._timer_1tp09_1 {
+    font-family: ui-monospace,SFMono-Regular,SF Mono,Menlo,Monaco,Consolas,Liberation Mono,monospace;
+    text-align: center;
+    font-weight: 700;
+    font-size: 24px;
+    margin-block:16px}
+
+._noNetworkConnectionWrapper_1xj8q_1 {
+    position: relative;
+    color: var(--colors-grey600);
+    margin-top: var(--spacers-dp12);
+    display: flex;
+    align-items: center;
+    gap: var(--spacers-dp8)
+}

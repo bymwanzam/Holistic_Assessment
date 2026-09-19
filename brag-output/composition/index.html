@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1920, height=1080">
+    <title>GHS Holistic Assessment — brag</title>
+    <script src="assets/vendor/gsap.min.js"></script>
+    <script src="assets/audio-data.js"></script>
+    <style>
+      @font-face { font-family: "Roboto"; font-weight: 300; src: url("assets/fonts/roboto-latin-300.woff2") format("woff2"); }
+      @font-face { font-family: "Roboto"; font-weight: 400; src: url("assets/fonts/roboto-latin-400.woff2") format("woff2"); }
+      @font-face { font-family: "Roboto"; font-weight: 500; src: url("assets/fonts/roboto-latin-500.woff2") format("woff2"); }
+      @font-face { font-family: "Roboto"; font-weight: 700; src: url("assets/fonts/roboto-latin-700.woff2") format("woff2"); }
+
+      /* Palette, straight from src/theme.css and DHIS2's greys. */
+      :root {
+        --bg: #fbfcfd;
+        --panel: #ffffff;
+        --grey200: #f3f5f7;
+        --grey300: #e8edf2;
+        --grey400: #d5dde5;
+        --grey700: #4a5768;
+        --grey900: #212934;
+        --brand: #0b6b35;
+        --brand-tint: #e9f4ed;
+        --brand-border: #b7ddc6;
+        --obj1: #14532d; --obj1-tint: #e8f2ec; --obj1-ink: #103f23;
+        --obj2: #2a78d6; --obj2-tint: #eef4fd; --obj2-border: #c3daf6; --obj2-ink: #1d4f8f;
+        --obj3: #dc6803; --obj3-tint: #fdf1e3; --obj3-ink: #8a4408;
+        --dhis2: #00796b; --dhis2-tint: #e7f4f2; --dhis2-border: #a8d5cf; --dhis2-ink: #00504a;
+        --manual: #b45309; --manual-tint: #fdf3e4; --manual-border: #f0d8ac; --manual-ink: #8a3f07;
+        --s2: #43a047; --s2-tint: #e4f4e5; --s2-ink: #14471a;
+        --s1: #8bcb8e; --s1-tint: #f2faf2; --s1-ink: #1f6626;
+        --sn1: #d76b6b; --sn1-tint: #fdeded; --sn1-ink: #a52121;
+        --sn2: #b71c1c; --sn2-tint: #f7d9d9; --sn2-ink: #7a1212;
+        --moderate: #8bcb8e; --moderate-surface: #c3e5c5; --moderate-ink: #1f6626;
+        --track: #e6eaef;
+      }
+
+      * { box-sizing: border-box; }
+      html, body { margin: 0; background: var(--bg); }
+      body {
+        font-family: "Roboto", sans-serif;
+        color: var(--grey900);
+        -webkit-font-smoothing: antialiased;
+      }
+
+      #root {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: var(--bg);
+      }
+
+      /* ---------- persistent background ---------- */
+      .bg-layer { position: absolute; inset: 0; pointer-events: none; }
+      #bg-grid-wrap { position: absolute; inset: -120px 0 -120px 0; }
+      #bg-grid {
+        width: 100%;
+        height: 100%;
+        background-image:
+          linear-gradient(to right, rgba(33, 41, 52, 0.07) 2px, transparent 2px),
+          linear-gradient(to bottom, rgba(33, 41, 52, 0.07) 2px, transparent 2px);
+        background-size: 80px 80px;
+      }
+      #bg-glow-wrap {
+        position: absolute;
+        width: 1500px;
+        height: 1500px;
+        right: -520px;
+        top: -640px;
+      }
+      #bg-glow {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(11, 107, 53, 0.22) 0%, rgba(11, 107, 53, 0.08) 42%, rgba(11, 107, 53, 0) 70%);
+      }
+      #bg-glow2-wrap {
+        position: absolute;
+        width: 1200px;
+        height: 1200px;
+        left: -560px;
+        bottom: -640px;
+      }
+      #bg-glow2 {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(42, 120, 214, 0.14) 0%, rgba(42, 120, 214, 0.05) 45%, rgba(42, 120, 214, 0) 70%);
+      }
+
+      .clip { position: absolute; inset: 0; }
+      .scene-inner { position: absolute; inset: 0; }
+
+      /* ---------- scene 1: hook ---------- */
+      #s1-copy {
+        position: absolute;
+        left: 140px;
+        top: 0;
+        bottom: 0;
+        width: 880px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+      .kicker {
+        font-size: 26px;
+        font-weight: 500;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--grey700);
+        margin-bottom: 36px;
+      }
+      .hook-line {
+        display: block;
+        font-size: 104px;
+        line-height: 1.12;
+        font-weight: 300;
+        letter-spacing: -0.01em;
+        white-space: nowrap;
+      }
+      .hook-line b { font-weight: 700; }
+      #s1-rule {
+        display: block;
+        width: 180px;
+        height: 8px;
+        border-radius: 4px;
+        margin-top: 44px;
+        background: var(--brand);
+        transform-origin: left center;
+      }
+      #s1-grid-wrap {
+        position: absolute;
+        left: 1060px;
+        top: 274px;
+        width: 732px;
+      }
+      #s1-grid {
+        display: grid;
+        grid-template-columns: repeat(10, 66px);
+        gap: 8px;
+      }
+      .code-cell {
+        height: 46px;
+        border-radius: 6px;
+        background: var(--panel);
+        border: 2px solid var(--grey300);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 17px;
+        font-weight: 500;
+        font-variant-numeric: tabular-nums;
+      }
+      .code-cell[data-objective="1"] { border-top: 5px solid var(--obj1); color: var(--obj1-ink); }
+      .code-cell[data-objective="2"] { border-top: 5px solid var(--obj2); color: var(--obj2-ink); }
+      .code-cell[data-objective="3"] { border-top: 5px solid var(--obj3); color: var(--obj3-ink); }
+
+      /* ---------- scene 2: the app ---------- */
+      /* Camera: a full-frame wrapper that pushes in on the table and the score. */
+      #s2-camera { position: absolute; inset: 0; transform-origin: 960px 540px; }
+      #s2-window {
+        position: absolute;
+        left: 80px;
+        top: 66px;
+        width: 1760px;
+        height: 948px;
+        border-radius: 16px;
+        background: var(--bg);
+        border: 2px solid var(--grey400);
+        box-shadow: 0 30px 80px rgba(33, 41, 52, 0.16), 0 6px 18px rgba(33, 41, 52, 0.08);
+        overflow: hidden;
+        display: flex;
+      }
+      .app-sidebar {
+        flex: 0 0 290px;
+        background: var(--panel);
+        border-right: 2px solid var(--grey300);
+        padding: 30px 0;
+      }
+      .app-brand {
+        padding: 0 26px 26px;
+        border-bottom: 2px solid var(--grey300);
+        margin-bottom: 14px;
+      }
+      .brand-mark { display: flex; gap: 5px; margin-bottom: 14px; }
+      .brand-mark i { display: block; width: 30px; height: 7px; border-radius: 4px; }
+      .brand-mark i:nth-child(1) { background: var(--obj1); }
+      .brand-mark i:nth-child(2) { background: var(--obj2); }
+      .brand-mark i:nth-child(3) { background: var(--obj3); }
+      .app-brand-title { font-size: 24px; font-weight: 700; line-height: 1.25; }
+      .app-brand-sub { font-size: 18px; color: var(--grey700); margin-top: 4px; }
+      .nav-item {
+        margin: 4px 12px;
+        padding: 12px 16px;
+        border-radius: 6px;
+        font-size: 19px;
+        color: var(--grey900);
+      }
+      .nav-item.active { background: var(--brand); color: #ffffff; font-weight: 500; }
+
+      .app-main { flex: 1 1 auto; padding: 32px 34px; position: relative; }
+      .page-header { display: flex; align-items: center; gap: 18px; }
+      .page-title { font-size: 34px; font-weight: 500; margin: 0; }
+      .status-tag {
+        font-size: 17px;
+        font-weight: 500;
+        padding: 4px 12px;
+        border-radius: 14px;
+        background: var(--grey300);
+        color: var(--grey900);
+      }
+      .context-bar {
+        display: flex;
+        align-items: flex-end;
+        gap: 18px;
+        margin-top: 22px;
+        padding-bottom: 22px;
+        border-bottom: 2px solid var(--grey300);
+      }
+      .field-label { font-size: 16px; color: var(--grey700); margin-bottom: 6px; }
+      .field-box {
+        font-size: 20px;
+        padding: 10px 16px;
+        min-width: 170px;
+        border-radius: 5px;
+        border: 2px solid var(--grey400);
+        background: var(--panel);
+      }
+      .field-box.wide { min-width: 250px; }
+      .ctx-buttons { margin-left: auto; display: flex; gap: 12px; }
+      .btn {
+        position: relative;
+        font-size: 19px;
+        font-weight: 500;
+        padding: 11px 20px;
+        border-radius: 5px;
+        border: 2px solid var(--grey400);
+        background: var(--panel);
+        color: var(--grey900);
+        white-space: nowrap;
+      }
+      .btn.primary { background: #1565c0; border-color: #0d47a1; color: #ffffff; }
+      .btn.muted { color: var(--grey700); }
+      #s2-fetch-press {
+        position: absolute;
+        inset: -2px;
+        border-radius: 5px;
+        background: rgba(33, 41, 52, 0.12);
+        opacity: 0;
+      }
+      #s2-cursor {
+        position: absolute;
+        left: 58%;
+        top: 62%;
+        width: 36px;
+        height: 44px;
+        z-index: 5;
+      }
+      #s2-cursor svg { display: block; width: 36px; height: 44px; }
+
+      .app-body { display: flex; gap: 26px; margin-top: 22px; }
+      .app-content { flex: 1 1 auto; min-width: 0; }
+      .tabs { display: flex; gap: 6px; border-bottom: 2px solid var(--grey300); }
+      .tab {
+        position: relative;
+        font-size: 19px;
+        padding: 12px 18px;
+        color: var(--grey700);
+      }
+      .tab.active { color: var(--obj2-ink); font-weight: 500; }
+      .tab.active::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: -2px;
+        height: 4px;
+        background: var(--obj2);
+      }
+      .tab-count { display: inline-grid; margin-left: 4px; }
+      .tab-count span { grid-area: 1 / 1; }
+      .obj-title { font-size: 19px; color: var(--grey900); margin: 16px 0 14px; }
+
+      .ind-table {
+        border: 2px solid var(--grey300);
+        border-top: 4px solid var(--obj2);
+        border-radius: 8px;
+        background: var(--panel);
+        overflow: hidden;
+      }
+      .ind-row {
+        display: grid;
+        grid-template-columns: 70px 1fr 116px 106px 128px 118px 96px;
+        align-items: center;
+        border-bottom: 2px solid var(--grey200);
+      }
+      .ind-row:last-child { border-bottom: 0; }
+      .ind-row > div { padding: 12px 10px; }
+      .ind-head { background: var(--obj2-tint); border-bottom: 2px solid var(--obj2-border); }
+      .ind-head > div { font-size: 16px; font-weight: 500; color: var(--obj2-ink); padding: 12px 10px; }
+      .num { text-align: right; font-variant-numeric: tabular-nums; }
+      .cell-code { font-size: 19px; font-weight: 500; color: var(--obj2-ink); font-variant-numeric: tabular-nums; }
+      .cell-name { font-size: 19px; line-height: 1.3; }
+      .badge {
+        display: inline-block;
+        font-size: 15px;
+        font-weight: 500;
+        padding: 3px 10px;
+        border-radius: 12px;
+        border: 2px solid;
+      }
+      .badge.dhis2 { background: var(--dhis2-tint); color: var(--dhis2-ink); border-color: var(--dhis2-border); }
+      .badge.manual { background: var(--manual-tint); color: var(--manual-ink); border-color: var(--manual-border); }
+      .input {
+        position: relative;
+        height: 40px;
+        border-radius: 4px;
+        border: 2px solid var(--grey400);
+        background: var(--panel);
+        font-size: 19px;
+        line-height: 36px;
+        padding: 0 10px;
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+      }
+      .input .fill {
+        position: absolute;
+        inset: -2px;
+        border-radius: 4px;
+        border: 2px solid var(--dhis2);
+        background: var(--dhis2-tint);
+        color: var(--dhis2-ink);
+        font-weight: 500;
+        line-height: 36px;
+        padding: 0 10px;
+        text-align: right;
+      }
+      .cell-target { font-size: 19px; line-height: 1.2; }
+      .direction { font-size: 14px; color: var(--grey700); margin-top: 2px; }
+      .chip-slot { position: relative; height: 34px; }
+      .chip {
+        position: absolute;
+        right: 10px;
+        top: 0;
+        min-width: 56px;
+        height: 34px;
+        padding: 0 10px;
+        border-radius: 17px;
+        border: 2px solid;
+        font-size: 19px;
+        font-weight: 500;
+        line-height: 30px;
+        text-align: center;
+        font-variant-numeric: tabular-nums;
+      }
+      .chip.p2 { background: var(--s2-tint); color: var(--s2-ink); border-color: var(--s2); }
+      .chip.p1 { background: var(--s1-tint); color: var(--s1-ink); border-color: var(--s1); }
+      .chip.n1 { background: var(--sn1-tint); color: var(--sn1-ink); border-color: var(--sn1); }
+      .chip.n2 { background: var(--sn2-tint); color: var(--sn2-ink); border-color: var(--sn2); }
+
+      .app-aside { flex: 0 0 372px; }
+      .summary {
+        position: relative;
+        background: var(--panel);
+        border: 2px solid var(--grey300);
+        border-radius: 10px;
+        padding: 20px;
+      }
+      .headline {
+        position: relative;
+        border-radius: 8px;
+        padding: 18px;
+        background: var(--moderate-surface);
+        color: var(--moderate-ink);
+      }
+      #s2-headline-flash {
+        position: absolute;
+        inset: 0;
+        border-radius: 8px;
+        box-shadow: inset 0 0 0 4px var(--moderate-ink);
+        opacity: 0;
+      }
+      .index-label { font-size: 18px; font-weight: 500; }
+      .index-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 6px; }
+      .index-value { font-size: 76px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
+      .band-chip {
+        font-size: 17px;
+        font-weight: 500;
+        padding: 5px 12px;
+        border-radius: 14px;
+        background: #ffffff;
+        color: var(--moderate-ink);
+        border: 2px solid var(--moderate);
+        white-space: nowrap;
+      }
+      .index-track, .bar {
+        position: relative;
+        height: 10px;
+        border-radius: 5px;
+        background: rgba(255, 255, 255, 0.7);
+        margin-top: 14px;
+        overflow: hidden;
+      }
+      .bar { background: var(--track); margin-top: 8px; }
+      .fill-bar {
+        display: block;
+        width: 100%;
+        height: 100%;
+        border-radius: 5px;
+        transform-origin: left center;
+      }
+      #s2-index-fill { background: var(--moderate-ink); }
+      .raw { font-size: 16px; margin-top: 10px; font-variant-numeric: tabular-nums; }
+      .section-title { font-size: 16px; font-weight: 500; color: var(--grey700); text-transform: uppercase; letter-spacing: 0.06em; margin: 22px 0 6px; }
+      .obj-score { margin-top: 14px; }
+      .obj-score-head { display: flex; justify-content: space-between; font-size: 19px; }
+      .obj-score-head strong { font-weight: 700; font-variant-numeric: tabular-nums; }
+      .dot { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 8px; }
+      .obj-score[data-objective="1"] .dot, .obj-score[data-objective="1"] .fill-bar { background: var(--obj1); }
+      .obj-score[data-objective="2"] .dot, .obj-score[data-objective="2"] .fill-bar { background: var(--obj2); }
+      .obj-score[data-objective="3"] .dot, .obj-score[data-objective="3"] .fill-bar { background: var(--obj3); }
+      .obj-meta { font-size: 15px; color: var(--grey700); margin-top: 5px; }
+      .meta-swap { display: grid; }
+      .meta-swap span { grid-area: 1 / 1; }
+
+      /* ---------- scene 3: the proof ---------- */
+      #s3-wrap { position: absolute; left: 140px; right: 140px; top: 120px; }
+      #s3-kicker { font-size: 26px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--grey700); }
+      #s3-table { margin-top: 40px; }
+      .cmp-row {
+        display: grid;
+        grid-template-columns: 380px 540px 540px 1fr;
+        align-items: center;
+        height: 132px;
+        border-bottom: 3px solid var(--grey300);
+      }
+      .cmp-head { height: 64px; border-bottom: 3px solid var(--grey400); }
+      .cmp-head > div { font-size: 24px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--grey700); }
+      .cmp-head > div.app-col { color: var(--brand); }
+      .cmp-obj { display: flex; align-items: center; gap: 20px; font-size: 42px; font-weight: 500; }
+      .cmp-obj i { display: block; width: 12px; height: 60px; border-radius: 6px; }
+      .cmp-row[data-objective="1"] .cmp-obj i { background: var(--obj1); }
+      .cmp-row[data-objective="2"] .cmp-obj i { background: var(--obj2); }
+      .cmp-row[data-objective="3"] .cmp-obj i { background: var(--obj3); }
+      .cmp-num { font-size: 76px; font-weight: 300; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+      .cmp-app { position: relative; }
+      .cmp-app .cmp-num { font-weight: 500; color: var(--grey900); }
+      .check {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        background: var(--brand);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .check svg { display: block; width: 36px; height: 36px; }
+      #s3-headline {
+        margin-top: 56px;
+        font-size: 88px;
+        font-weight: 500;
+        letter-spacing: -0.01em;
+        line-height: 1.1;
+      }
+      #s3-headline em { font-style: normal; color: var(--brand); }
+      #s3-foot { margin-top: 18px; font-size: 26px; color: var(--grey700); }
+
+      /* ---------- scene 4: outro ---------- */
+      #s4-lockup {
+        position: absolute;
+        left: 140px;
+        right: 140px;
+        top: 0;
+        bottom: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+      #s4-mark { display: flex; gap: 12px; margin-bottom: 44px; }
+      #s4-mark i { display: block; width: 150px; height: 18px; border-radius: 9px; transform-origin: left center; }
+      #s4-mark i:nth-child(1) { background: var(--obj1); }
+      #s4-mark i:nth-child(2) { background: var(--obj2); }
+      #s4-mark i:nth-child(3) { background: var(--obj3); }
+      #s4-name { font-size: 132px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.02; }
+      #s4-tagline { font-size: 52px; font-weight: 300; color: var(--grey700); margin-top: 26px; }
+      #s4-credit {
+        margin-top: 70px;
+        padding-top: 26px;
+        border-top: 3px solid var(--grey300);
+        width: 1100px;
+        font-size: 30px;
+        color: var(--grey700);
+      }
+      #s4-credit strong { font-weight: 500; color: var(--grey900); }
+    </style>
+  </head>
+  <body>
+    <div data-hf-id="hf-3uxp" id="root" data-composition-id="main" data-start="0" data-width="1920" data-height="1080" data-duration="21">
+      <!-- Persistent background: a light DHIS2-grey grid and two soft glows, the green one breathing with the music. -->
+      <div data-hf-id="hf-iwgi" id="bg" class="bg-layer">
+        <div data-hf-id="hf-9xfz" id="bg-grid-wrap" data-layout-allow-overflow=""><div data-hf-id="hf-r3kh" id="bg-grid"></div></div>
+        <div data-hf-id="hf-6u66" id="bg-glow-wrap" data-layout-allow-overflow=""><div data-hf-id="hf-isbq" id="bg-glow"></div></div>
+        <div data-hf-id="hf-ox66" id="bg-glow2-wrap" data-layout-allow-overflow=""><div data-hf-id="hf-0fgo" id="bg-glow2"></div></div>
+      </div>
+
+      <!-- Scene 1 — Hook -->
+      <section data-hf-id="hf-3ale" id="s1" class="clip" data-start="0" data-duration="3.35" data-track-index="1">
+        <div data-hf-id="hf-bbya" id="s1-inner" class="scene-inner">
+          <div data-hf-id="hf-5js1" id="s1-copy">
+            <div data-hf-id="hf-swxl" id="s1-kicker" class="kicker">Ghana Health Service · Holistic Assessment</div>
+            <span data-hf-id="hf-y1yd" id="s1-l1" class="hook-line"><b data-hf-id="hf-4h0g">94</b> indicators.</span>
+            <span data-hf-id="hf-1ika" id="s1-l2" class="hook-line"><b data-hf-id="hf-o91f">Three</b> objectives.</span>
+            <span data-hf-id="hf-frb1" id="s1-l3" class="hook-line"><b data-hf-id="hf-zdnz">One</b> score.</span>
+            <span data-hf-id="hf-emet" id="s1-rule"></span>
+          </div>
+          <div data-hf-id="hf-x24z" id="s1-grid-wrap"><div data-hf-id="hf-9btm" id="s1-grid"></div></div>
+        </div>
+      </section>
+
+      <!-- Scene 2 — Fetch and score -->
+      <section data-hf-id="hf-oxwj" id="s2" class="clip" data-start="3.35" data-duration="7.55" data-track-index="2">
+        <div data-hf-id="hf-gs0d" id="s2-inner" class="scene-inner">
+          <div data-hf-id="hf-a7m1" id="s2-camera" data-layout-allow-overflow="">
+          <div data-hf-id="hf-jt9z" id="s2-window">
+            <nav data-hf-id="hf-i3i8" class="app-sidebar">
+              <div data-hf-id="hf-so6d" class="app-brand">
+                <div data-hf-id="hf-d6dv" class="brand-mark"><i data-hf-id="hf-wt6k"></i><i data-hf-id="hf-zeb8"></i><i data-hf-id="hf-y7e5"></i></div>
+                <div data-hf-id="hf-nfnt" class="app-brand-title">Holistic Assessment</div>
+                <div data-hf-id="hf-hers" class="app-brand-sub">Ghana Health Service</div>
+              </div>
+              <div data-hf-id="hf-qwgj" class="nav-item">Dashboard</div>
+              <div data-hf-id="hf-9st6" class="nav-item active">Regional Assessment</div>
+              <div data-hf-id="hf-624f" class="nav-item">District Assessment</div>
+              <div data-hf-id="hf-eae8" class="nav-item">Regional Peer Review</div>
+              <div data-hf-id="hf-ia0z" class="nav-item">District Peer Review</div>
+              <div data-hf-id="hf-dcpc" class="nav-item">Reports</div>
+              <div data-hf-id="hf-k8g2" class="nav-item">Help</div>
+            </nav>
+
+            <main data-hf-id="hf-ws89" class="app-main">
+              <div data-hf-id="hf-iuy1" class="page-header">
+                <h1 data-hf-id="hf-x7fb" class="page-title">Regional Assessment</h1>
+                <span data-hf-id="hf-ziyv" class="status-tag">Draft</span>
+              </div>
+
+              <div data-hf-id="hf-tbzt" class="context-bar">
+                <div data-hf-id="hf-yeow">
+                  <div data-hf-id="hf-ico0" class="field-label">Assessment year</div>
+                  <div data-hf-id="hf-vyar" class="field-box">2025</div>
+                </div>
+                <div data-hf-id="hf-y7yw">
+                  <div data-hf-id="hf-0lcx" class="field-label">Region</div>
+                  <div data-hf-id="hf-m8jc" class="field-box wide">Upper East</div>
+                </div>
+                <div data-hf-id="hf-6h5z" class="ctx-buttons">
+                  <div data-hf-id="hf-eqh4" id="s2-fetch" class="btn">
+                    Fetch DHIS2 data
+                    <span data-hf-id="hf-ykmw" id="s2-fetch-press"></span>
+                    <div data-hf-id="hf-xfc5" id="s2-cursor">
+                      <svg data-hf-id="hf-aaxd" viewBox="0 0 36 44" aria-hidden="true">
+                        <path data-hf-id="hf-6g6c" d="M3 2 L3 34 L11.5 26.5 L17.5 40 L23.5 37.4 L17.6 24.2 L29 24.2 Z" fill="#212934" stroke="#ffffff" stroke-width="2.6" stroke-linejoin="round" />
+                      </svg>
+                    </div>
+                  </div>
+                  <div data-hf-id="hf-n1y4" class="btn primary">Save draft</div>
+                  <div data-hf-id="hf-p02u" class="btn muted">Submit for review</div>
+                </div>
+              </div>
+
+              <div data-hf-id="hf-fgvm" class="app-body">
+                <section data-hf-id="hf-mgvx" class="app-content">
+                  <div data-hf-id="hf-5rmk" class="tabs">
+                    <div data-hf-id="hf-wk0f" class="tab">Objective 1 (42/42)</div>
+                    <div data-hf-id="hf-oxyu" class="tab active">Objective 2 <span data-hf-id="hf-zrm8" class="tab-count"><span data-hf-id="hf-es60" id="s2-count-pre">(16/20)</span><span data-hf-id="hf-7ft2" id="s2-count-post">(20/20)</span></span></div>
+                    <div data-hf-id="hf-neqp" class="tab">Objective 3 (35/35)</div>
+                  </div>
+                  <p data-hf-id="hf-m4fv" class="obj-title">Objective 2: Reduce avoidable maternal, adolescent &amp; child deaths and disabilities</p>
+
+                  <div data-hf-id="hf-xw68" class="ind-table">
+                    <div data-hf-id="hf-0jca" class="ind-row ind-head">
+                      <div data-hf-id="hf-b11x">Code</div><div data-hf-id="hf-brlt">Indicator</div><div data-hf-id="hf-xf5x">Source</div>
+                      <div data-hf-id="hf-nnit" class="num">Previous</div><div data-hf-id="hf-miqd" class="num">Current</div><div data-hf-id="hf-1qex" class="num">Target</div><div data-hf-id="hf-dllg" class="num">Outcome</div>
+                    </div>
+
+                    <div data-hf-id="hf-pxog" class="ind-row">
+                      <div data-hf-id="hf-0ggt" class="cell-code">2.1</div>
+                      <div data-hf-id="hf-9hgf" class="cell-name">Proportion of facility deaths that are medically certified</div>
+                      <div data-hf-id="hf-x11t"><span data-hf-id="hf-48ma" class="badge manual">Manual</span></div>
+                      <div data-hf-id="hf-xfcu"><div data-hf-id="hf-d5jo" class="input">0.846</div></div>
+                      <div data-hf-id="hf-w8fr"><div data-hf-id="hf-7497" class="input">0.942</div></div>
+                      <div data-hf-id="hf-l17f" class="num cell-target">0.9<div data-hf-id="hf-cdri" class="direction">higher is better</div></div>
+                      <div data-hf-id="hf-i5e3" class="chip-slot"><span data-hf-id="hf-33wi" class="chip p2">+2</span></div>
+                    </div>
+
+                    <div data-hf-id="hf-ye9k" class="ind-row">
+                      <div data-hf-id="hf-4182" class="cell-code">2.8</div>
+                      <div data-hf-id="hf-h801" class="cell-name">Penta 3 coverage</div>
+                      <div data-hf-id="hf-wmqs"><span data-hf-id="hf-594i" class="badge dhis2">DHIS2</span></div>
+                      <div data-hf-id="hf-vftp"><div data-hf-id="hf-qnmp" class="input">0.926</div></div>
+                      <div data-hf-id="hf-vu4q"><div data-hf-id="hf-sc8k" class="input"><div data-hf-id="hf-am3c" id="s2-fill-1" class="fill">0.905</div></div></div>
+                      <div data-hf-id="hf-7i96" class="num cell-target">0.95<div data-hf-id="hf-d8ky" class="direction">higher is better</div></div>
+                      <div data-hf-id="hf-9oa3" class="chip-slot"><span data-hf-id="hf-yixq" id="s2-pre-1" class="chip n2">−2</span><span data-hf-id="hf-0h1y" id="s2-chip-1" class="chip p1">+1</span></div>
+                    </div>
+
+                    <div data-hf-id="hf-x7ch" class="ind-row">
+                      <div data-hf-id="hf-0dtw" class="cell-code">2.11</div>
+                      <div data-hf-id="hf-zs8b" class="cell-name">Institutional Maternal Mortality Ratio per 100,000</div>
+                      <div data-hf-id="hf-1043"><span data-hf-id="hf-ehpy" class="badge dhis2">DHIS2</span></div>
+                      <div data-hf-id="hf-1ef4"><div data-hf-id="hf-p8xs" class="input">97</div></div>
+                      <div data-hf-id="hf-c4s8"><div data-hf-id="hf-39qk" class="input"><div data-hf-id="hf-tuia" id="s2-fill-2" class="fill">133</div></div></div>
+                      <div data-hf-id="hf-4x78" class="num cell-target">125<div data-hf-id="hf-jw22" class="direction">lower is better</div></div>
+                      <div data-hf-id="hf-99z2" class="chip-slot"><span data-hf-id="hf-o12h" id="s2-pre-2" class="chip n2">−2</span><span data-hf-id="hf-fko6" id="s2-chip-2" class="chip n1">−1</span></div>
+                    </div>
+
+                    <div data-hf-id="hf-xlni" class="ind-row">
+                      <div data-hf-id="hf-z6wt" class="cell-code">2.12</div>
+                      <div data-hf-id="hf-b1ne" class="cell-name">Institutional Neonatal Mortality Rate per 1000</div>
+                      <div data-hf-id="hf-bqh7"><span data-hf-id="hf-ew0z" class="badge dhis2">DHIS2</span></div>
+                      <div data-hf-id="hf-bc66"><div data-hf-id="hf-95hn" class="input">5.35</div></div>
+                      <div data-hf-id="hf-axv5"><div data-hf-id="hf-22th" class="input"><div data-hf-id="hf-lswg" id="s2-fill-3" class="fill">5.7</div></div></div>
+                      <div data-hf-id="hf-g9hj" class="num cell-target">7<div data-hf-id="hf-ltqm" class="direction">lower is better</div></div>
+                      <div data-hf-id="hf-8vo1" class="chip-slot"><span data-hf-id="hf-4iks" id="s2-pre-3" class="chip n2">−2</span><span data-hf-id="hf-94f4" id="s2-chip-3" class="chip p1">+1</span></div>
+                    </div>
+
+                    <div data-hf-id="hf-weqf" class="ind-row">
+                      <div data-hf-id="hf-0s4x" class="cell-code">2.16</div>
+                      <div data-hf-id="hf-699n" class="cell-name">Percentage of maternal deaths that are audited</div>
+                      <div data-hf-id="hf-ajk4"><span data-hf-id="hf-fac0" class="badge dhis2">DHIS2</span></div>
+                      <div data-hf-id="hf-a593"><div data-hf-id="hf-8a81" class="input">0.975</div></div>
+                      <div data-hf-id="hf-9qy2"><div data-hf-id="hf-2h4i" class="input"><div data-hf-id="hf-97ge" id="s2-fill-4" class="fill">1</div></div></div>
+                      <div data-hf-id="hf-h23l" class="num cell-target">1<div data-hf-id="hf-dmvz" class="direction">higher is better</div></div>
+                      <div data-hf-id="hf-8hd0" class="chip-slot"><span data-hf-id="hf-j8dr" id="s2-pre-4" class="chip n2">−2</span><span data-hf-id="hf-01l3" id="s2-chip-4" class="chip p2">+2</span></div>
+                    </div>
+                  </div>
+                </section>
+
+                <aside data-hf-id="hf-egyv" class="app-aside">
+                  <div data-hf-id="hf-gab6" id="s2-summary" class="summary">
+                    <div data-hf-id="hf-sodk" class="headline">
+                      <div data-hf-id="hf-016s" class="index-label">Overall performance</div>
+                      <div data-hf-id="hf-oc83" class="index-row">
+                        <div data-hf-id="hf-w18y" id="s2-index" class="index-value">3.47</div>
+                        <span data-hf-id="hf-7alg" class="band-chip">Moderately Performing</span>
+                      </div>
+                      <div data-hf-id="hf-9t7a" class="index-track"><span data-hf-id="hf-5yvu" id="s2-index-fill" class="fill-bar"></span></div>
+                      <div data-hf-id="hf-2ytz" id="s2-raw" class="raw">Raw score 1.447 of 3.733</div>
+                      <span data-hf-id="hf-5xgf" id="s2-headline-flash"></span>
+                    </div>
+                    <div data-hf-id="hf-c2ji" class="section-title">Objective scores</div>
+                    <div data-hf-id="hf-3wgs" class="obj-score" data-objective="1">
+                      <div data-hf-id="hf-xftt" class="obj-score-head"><span data-hf-id="hf-zdjr"><span data-hf-id="hf-9gry" class="dot"></span>Objective 1</span><strong data-hf-id="hf-padx">3.59</strong></div>
+                      <div data-hf-id="hf-ufsv" class="bar"><span data-hf-id="hf-2vxq" id="s2-bar-1" class="fill-bar" style="width: 71.8%"></span></div>
+                      <div data-hf-id="hf-ppxb" class="obj-meta">42/42 complete</div>
+                    </div>
+                    <div data-hf-id="hf-ckcn" class="obj-score" data-objective="2">
+                      <div data-hf-id="hf-l56d" class="obj-score-head"><span data-hf-id="hf-yz8q"><span data-hf-id="hf-zcc2" class="dot"></span>Objective 2</span><strong data-hf-id="hf-lkeh" id="s2-obj2">2.92</strong></div>
+                      <div data-hf-id="hf-c51b" class="bar"><span data-hf-id="hf-ykdi" id="s2-bar-2" class="fill-bar"></span></div>
+                      <div data-hf-id="hf-e6oi" class="obj-meta meta-swap"><span data-hf-id="hf-6l3s" id="s2-meta-pre">16/20 complete</span><span data-hf-id="hf-wbrg" id="s2-meta-post">20/20 complete</span></div>
+                    </div>
+                    <div data-hf-id="hf-8m8m" class="obj-score" data-objective="3">
+                      <div data-hf-id="hf-mc3g" class="obj-score-head"><span data-hf-id="hf-ykxp"><span data-hf-id="hf-zqn3" class="dot"></span>Objective 3</span><strong data-hf-id="hf-kt4f">4.01</strong></div>
+                      <div data-hf-id="hf-bqqa" class="bar"><span data-hf-id="hf-6zdy" id="s2-bar-3" class="fill-bar" style="width: 80.2%"></span></div>
+                      <div data-hf-id="hf-2x3j" class="obj-meta">35/35 complete</div>
+                    </div>
+                  </div>
+                </aside>
+              </div>
+            </main>
+          </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Scene 3 — The proof -->
+      <section data-hf-id="hf-d9q4" id="s3" class="clip" data-start="10.9" data-duration="4.9" data-track-index="3">
+        <div data-hf-id="hf-tktc" id="s3-inner" class="scene-inner">
+          <div data-hf-id="hf-a77g" id="s3-wrap">
+            <div data-hf-id="hf-a4a7" id="s3-kicker">Upper East Region · 2025 · Objective scores</div>
+            <div data-hf-id="hf-k3c4" id="s3-table">
+              <div data-hf-id="hf-ta8h" id="s3-head" class="cmp-row cmp-head">
+                <div data-hf-id="hf-9cn1"></div>
+                <div data-hf-id="hf-ih32">Published workbook</div>
+                <div data-hf-id="hf-glmd" class="app-col">GHS Holistic Assessment</div>
+                <div data-hf-id="hf-fb8g"></div>
+              </div>
+              <div data-hf-id="hf-l25q" id="s3-row-1" class="cmp-row" data-objective="1">
+                <div data-hf-id="hf-mdrc" class="cmp-obj"><i data-hf-id="hf-ylp6"></i>Objective 1</div>
+                <div data-hf-id="hf-kj5x" class="cmp-num">0.625195990</div>
+                <div data-hf-id="hf-7s22" class="cmp-app"><div data-hf-id="hf-si7p" id="s3-app-1" class="cmp-num">0.625195990</div></div>
+                <div data-hf-id="hf-ewxf"><div data-hf-id="hf-b4bh" id="s3-check-1" class="check"><svg data-hf-id="hf-uely" viewBox="0 0 36 36" aria-hidden="true"><path data-hf-id="hf-0qgy" d="M7 19 L15 27 L30 10" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" /></svg></div></div>
+              </div>
+              <div data-hf-id="hf-5hzi" id="s3-row-2" class="cmp-row" data-objective="2">
+                <div data-hf-id="hf-l6u9" class="cmp-obj"><i data-hf-id="hf-0l8b"></i>Objective 2</div>
+                <div data-hf-id="hf-dfcp" class="cmp-num">0.598689801</div>
+                <div data-hf-id="hf-7vda" class="cmp-app"><div data-hf-id="hf-3kpc" id="s3-app-2" class="cmp-num">0.598689801</div></div>
+                <div data-hf-id="hf-88dv"><div data-hf-id="hf-ha1a" id="s3-check-2" class="check"><svg data-hf-id="hf-z2e2" viewBox="0 0 36 36" aria-hidden="true"><path data-hf-id="hf-stie" d="M7 19 L15 27 L30 10" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" /></svg></div></div>
+              </div>
+              <div data-hf-id="hf-b2yi" id="s3-row-3" class="cmp-row" data-objective="3">
+                <div data-hf-id="hf-ll5a" class="cmp-obj"><i data-hf-id="hf-0zjc"></i>Objective 3</div>
+                <div data-hf-id="hf-m50j" class="cmp-num">0.603242148</div>
+                <div data-hf-id="hf-89ob" class="cmp-app"><div data-hf-id="hf-s555" id="s3-app-3" class="cmp-num">0.603242148</div></div>
+                <div data-hf-id="hf-8mow"><div data-hf-id="hf-l85b" id="s3-check-3" class="check"><svg data-hf-id="hf-zgp3" viewBox="0 0 36 36" aria-hidden="true"><path data-hf-id="hf-t7tf" d="M7 19 L15 27 L30 10" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" /></svg></div></div>
+              </div>
+            </div>
+            <div data-hf-id="hf-j47l" id="s3-headline">Reproduces the workbook <em data-hf-id="hf-bufl">exactly.</em></div>
+            <div data-hf-id="hf-x261" id="s3-foot">Every indicator, objective and total, pinned by 351 tests</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Scene 4 — Outro -->
+      <section data-hf-id="hf-hne6" id="s4" class="clip" data-start="15.8" data-duration="5.2" data-track-index="4">
+        <div data-hf-id="hf-qvcj" id="s4-inner" class="scene-inner">
+          <div data-hf-id="hf-renb" id="s4-lockup">
+            <div data-hf-id="hf-23n2" id="s4-mark"><i data-hf-id="hf-eu5e" id="s4-bar-1"></i><i data-hf-id="hf-aw1d" id="s4-bar-2"></i><i data-hf-id="hf-a4dk" id="s4-bar-3"></i></div>
+            <div data-hf-id="hf-u5wp" id="s4-name">GHS Holistic Assessment</div>
+            <div data-hf-id="hf-nem9" id="s4-tagline">Assessment, peer review and reporting on DHIS2.</div>
+            <div data-hf-id="hf-hun9" id="s4-credit">Built by <strong data-hf-id="hf-fapl">Bigvalues IT Systems</strong> for the <strong data-hf-id="hf-ju46">Ghana Health Service</strong></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Audio: music bed with fade in/out, plus four sparse accents. -->
+      <audio data-hf-id="hf-0drn" id="bg-music" src="assets/music/happy-beats-business-moves-vol-12-by-ende-dot-app.mp3" data-start="0" data-duration="21" data-track-index="10" data-volume="1" data-automation="{&quot;version&quot;:1,&quot;lanes&quot;:[{&quot;target&quot;:&quot;volume&quot;,&quot;points&quot;:[{&quot;t&quot;:0,&quot;v&quot;:0},{&quot;t&quot;:0.4,&quot;v&quot;:0.3},{&quot;t&quot;:19.5,&quot;v&quot;:0.3},{&quot;t&quot;:21,&quot;v&quot;:0}]}]}"></audio>
+      <audio data-hf-id="hf-06gf" id="sfx-click" src="assets/sfx/ui/mouseclick1.ogg" data-start="5.28" data-duration="0.06" data-track-index="11" data-volume="0.7"></audio>
+      <audio data-hf-id="hf-p00u" id="sfx-drop" src="assets/sfx/interface/drop_001.ogg" data-start="8.70" data-duration="0.11" data-track-index="12" data-volume="0.6"></audio>
+      <audio data-hf-id="hf-4a2g" id="sfx-bong" src="assets/sfx/interface/bong_001.ogg" data-start="13.08" data-duration="0.12" data-track-index="13" data-volume="0.65"></audio>
+      <audio data-hf-id="hf-oouj" id="sfx-bell" src="assets/sfx/impact/impactBell_heavy_000.ogg" data-start="17.44" data-duration="1.5" data-track-index="14" data-volume="0.35"></audio>
+    </div>
+
+    <script>
+      (function () {
+        // Scene 1's texture: every regional indicator code, in framework order,
+        // edged in the colour of the objective it belongs to (41 / 19 / 34 = 94).
+        var grid = document.getElementById("s1-grid");
+        var counts = [41, 19, 34];
+        counts.forEach(function (n, o) {
+          for (var i = 1; i <= n; i++) {
+            var cell = document.createElement("div");
+            cell.className = "code-cell";
+            cell.setAttribute("data-objective", String(o + 1));
+            cell.textContent = o + 1 + "." + i;
+            grid.appendChild(cell);
+          }
+        });
+
+        var tl = gsap.timeline({ paused: true });
+
+        // ---------- background ----------
+        tl.fromTo("#bg-grid", { y: 0 }, { y: -80, duration: 21, ease: "none" }, 0);
+        tl.fromTo("#bg-glow2", { x: 0, y: 0 }, { x: 60, y: -40, duration: 21, ease: "sine.inOut" }, 0);
+
+        // Audio-reactive: the brand glow breathes with the bed's bass energy.
+        var AD = window.AUDIO_DATA;
+        var glow = document.getElementById("bg-glow");
+        for (var f = 0; f < AD.totalFrames; f++) {
+          tl.call(
+            (function (bands) {
+              return function () {
+                gsap.set(glow, { scale: 0.94 + bands[0] * 0.1, opacity: 0.6 + bands[0] * 0.4 });
+              };
+            })(AD.frames[f].bands),
+            [],
+            f / AD.fps
+          );
+        }
+
+        // ---------- scene 1: hook (0 – 3.35) ----------
+        tl.fromTo("#s1-kicker", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.5, ease: "power2.out" }, 0.05);
+        tl.fromTo("#s1-l1", { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 0.55, ease: "power3.out" }, 0.18);
+        tl.fromTo("#s1-l2", { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 0.55, ease: "power3.out" }, 0.5);
+        tl.fromTo("#s1-l3", { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 0.55, ease: "power3.out" }, 0.82);
+        tl.fromTo("#s1-rule", { scaleX: 0 }, { scaleX: 1, duration: 0.6, ease: "expo.out" }, 1.05);
+        tl.fromTo(
+          ".code-cell",
+          { opacity: 0, scale: 0.6 },
+          { opacity: 1, scale: 1, duration: 0.45, ease: "back.out(1.8)", stagger: { each: 0.008, grid: [10, 10], from: "start" } },
+          0.1
+        );
+        tl.fromTo("#s1-grid-wrap", { y: 20 }, { y: -26, duration: 3.35, ease: "none" }, 0);
+        tl.to("#s1-inner", { opacity: 0, y: -24, duration: 0.35, ease: "power2.in" }, 3.0);
+
+        // ---------- scene 2: fetch and score (3.35 – 10.9) ----------
+        tl.fromTo("#s2-inner", { opacity: 0 }, { opacity: 1, duration: 0.45, ease: "power1.out" }, 3.35);
+        tl.fromTo("#s2-window", { y: 50, scale: 0.97 }, { y: 0, scale: 1, duration: 0.8, ease: "power3.out" }, 3.35);
+
+        // DHIS2 cells start empty; the post-fetch values and chips start hidden.
+        tl.set(["#s2-fill-1", "#s2-fill-2", "#s2-fill-3", "#s2-fill-4"], { opacity: 0, y: 8 }, 0);
+        tl.set(["#s2-chip-1", "#s2-chip-2", "#s2-chip-3", "#s2-chip-4"], { opacity: 0, scale: 0.4 }, 0);
+        tl.set(["#s2-count-post", "#s2-meta-post"], { opacity: 0 }, 0);
+        tl.set("#s2-cursor", { opacity: 0, x: -260, y: 420 }, 0);
+
+        // Cursor glides in from the table and presses Fetch DHIS2 data.
+        tl.set("#s2-cursor", { opacity: 1 }, 4.1);
+        tl.to("#s2-cursor", { x: 0, y: 0, duration: 0.95, ease: "power2.inOut" }, 4.2);
+        tl.to("#s2-cursor", { scale: 0.84, duration: 0.1, ease: "power1.in", yoyo: true, repeat: 1 }, 5.25);
+        tl.fromTo("#s2-fetch-press", { opacity: 0 }, { opacity: 1, duration: 0.1, ease: "power1.in", yoyo: true, repeat: 1 }, 5.25);
+        tl.to("#s2-cursor", { x: 90, y: 70, opacity: 0, duration: 0.6, ease: "power2.in" }, 5.8);
+
+        // Camera pose ladder: full window for the click, then push in on the
+        // table and summary (x 406–1798, y 300–785 on canvas) and drift gently.
+        tl.set("#s2-camera", { scale: 1, x: 0, y: 0 }, 0);
+        tl.to(
+          "#s2-camera",
+          {
+            keyframes: [
+              { scale: 1.3, x: -185, y: 60, duration: 0.9, ease: "power2.inOut" },
+              { scale: 1.33, x: -196, y: 62, duration: 4.1, ease: "none" },
+            ],
+          },
+          5.5
+        );
+
+        // Values arrive from analytics, row by row.
+        tl.to(["#s2-fill-1", "#s2-fill-2", "#s2-fill-3", "#s2-fill-4"], { opacity: 1, y: 0, duration: 0.3, ease: "power2.out", stagger: 0.09 }, 5.5);
+        tl.to("#s2-count-pre", { opacity: 0, duration: 0.2 }, 5.85);
+        tl.to("#s2-count-post", { opacity: 1, duration: 0.2 }, 5.85);
+
+        // beat-grid: chip 1 at 6.00s, chip 2 at 6.56s, chip 3 at 7.09s, chip 4 at 7.64s
+        [6.0, 6.56, 7.09, 7.64].forEach(function (t, i) {
+          tl.to("#s2-pre-" + (i + 1), { opacity: 0, scale: 0.7, duration: 0.15, ease: "power1.in" }, t - 0.05);
+          tl.to("#s2-chip-" + (i + 1), { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(2.4)" }, t);
+        });
+
+        // beat-locked: 8.74s — the score settles to the workbook's 3.72.
+        var score = { v: 3.47, raw: 1.447, o2: 2.92 };
+        var indexEl = document.getElementById("s2-index");
+        var rawEl = document.getElementById("s2-raw");
+        var obj2El = document.getElementById("s2-obj2");
+        tl.to(
+          score,
+          {
+            v: 3.72,
+            raw: 1.827,
+            o2: 3.65,
+            duration: 0.8,
+            ease: "power2.out",
+            onUpdate: function () {
+              indexEl.textContent = score.v.toFixed(2);
+              rawEl.textContent = "Raw score " + score.raw.toFixed(3) + " of 3.733";
+              obj2El.textContent = score.o2.toFixed(2);
+            },
+          },
+          8.74
+        );
+        tl.fromTo("#s2-summary", { scale: 1 }, { scale: 1.04, duration: 0.25, ease: "power2.out", yoyo: true, repeat: 1 }, 8.74);
+        tl.fromTo("#s2-headline-flash", { opacity: 0 }, { opacity: 1, duration: 0.2, yoyo: true, repeat: 1, repeatDelay: 0.3 }, 8.74);
+        tl.fromTo("#s2-index-fill", { scaleX: 3.47 / 5 }, { scaleX: 3.72 / 5, duration: 0.8, ease: "power2.out" }, 8.74);
+        tl.fromTo("#s2-bar-2", { scaleX: 2.92 / 5 }, { scaleX: 3.65 / 5, duration: 0.8, ease: "power2.out" }, 8.74);
+        tl.to("#s2-meta-post", { opacity: 1, duration: 0.2 }, 8.74);
+        tl.to("#s2-meta-pre", { opacity: 0, duration: 0.2 }, 8.74);
+
+        tl.to("#s2-inner", { opacity: 0, duration: 0.4, ease: "power1.in" }, 10.5);
+
+        // ---------- scene 3: the proof (10.9 – 15.8) ----------
+        tl.fromTo("#s3-inner", { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power1.out" }, 10.9);
+        tl.fromTo("#s3-kicker", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.45, ease: "power2.out" }, 10.9);
+        tl.fromTo(["#s3-head", "#s3-row-1", "#s3-row-2", "#s3-row-3"], { opacity: 0, y: 26 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out", stagger: 0.07 }, 10.95);
+        tl.set(["#s3-app-1", "#s3-app-2", "#s3-app-3"], { clipPath: "inset(0% 100% 0% 0%)" }, 0);
+        tl.set(["#s3-check-1", "#s3-check-2", "#s3-check-3"], { opacity: 0, scale: 0.3 }, 0);
+
+        // beat-grid: app row 1 at 11.46s, row 2 at 12.02s, row 3 at 12.55s — typed digit by digit.
+        [11.46, 12.02, 12.55].forEach(function (t, i) {
+          tl.to("#s3-app-" + (i + 1), { clipPath: "inset(0% 0% 0% 0%)", duration: 0.42, ease: "steps(11)" }, t);
+        });
+
+        // beat-locked: 13.11s — the checks and the claim land together.
+        tl.to(["#s3-check-1", "#s3-check-2", "#s3-check-3"], { opacity: 1, scale: 1, duration: 0.45, ease: "back.out(2.2)", stagger: 0.06 }, 13.11);
+        tl.fromTo("#s3-headline", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.55, ease: "power3.out" }, 13.11);
+        tl.fromTo("#s3-foot", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.45, ease: "power2.out" }, 13.45);
+        tl.to("#s3-inner", { opacity: 0, duration: 0.35, ease: "power1.in" }, 15.45);
+
+        // ---------- scene 4: outro (15.8 – 21.0) ----------
+        tl.fromTo("#s4-inner", { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power1.out" }, 15.8);
+        tl.fromTo(["#s4-bar-1", "#s4-bar-2", "#s4-bar-3"], { scaleX: 0 }, { scaleX: 1, duration: 0.7, ease: "expo.out", stagger: 0.14 }, 15.95);
+        tl.set("#s4-name", { opacity: 0, y: 44 }, 0);
+        // beat-locked: 17.47s — the product name.
+        tl.to("#s4-name", { opacity: 1, y: 0, duration: 0.65, ease: "power3.out" }, 17.44);
+        tl.fromTo("#s4-tagline", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.55, ease: "power2.out" }, 17.85);
+        tl.fromTo("#s4-credit", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 18.3);
+        tl.fromTo("#s4-lockup", { scale: 1 }, { scale: 1.02, duration: 5.2, ease: "none" }, 15.8);
+
+        window.__timelines["main"] = tl;
+      })();
+    </script>
+  </body>
+</html>

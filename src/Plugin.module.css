@@ -1,0 +1,163 @@
+.plugin {
+    padding: var(--spacers-dp16);
+    font-size: 13px;
+    color: var(--colors-grey900);
+    block-size: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacers-dp12);
+    background: var(--colors-white);
+}
+
+.center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacers-dp24);
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--spacers-dp8);
+}
+
+.name {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.year {
+    font-size: 12px;
+    color: var(--colors-grey600);
+}
+
+/*
+ * The card's one big number. It takes its colour from the plugin's
+ * `data-performance` and always carries the category's name underneath, so
+ * nothing here depends on telling the five category colours apart.
+ */
+.indexBlock {
+    text-align: center;
+    padding: var(--spacers-dp12) var(--spacers-dp8);
+    border-radius: 6px;
+    background: var(--ghs-perf-bg);
+    border: 1px solid var(--ghs-perf);
+}
+
+.indexValue {
+    font-size: 48px;
+    font-weight: 700;
+    line-height: 1.05;
+    color: var(--ghs-perf-ink);
+}
+
+.indexLabel {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--ghs-perf-ink);
+}
+
+.indexTrack {
+    position: relative;
+    block-size: 6px;
+    border-radius: 3px;
+    background: var(--colors-white);
+    border: 1px solid var(--ghs-perf);
+    margin-block-start: var(--spacers-dp8);
+    overflow: hidden;
+}
+
+.indexFill {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    border-start-end-radius: 3px;
+    border-end-end-radius: 3px;
+    background: var(--ghs-perf);
+}
+
+.bandLabel {
+    margin-block-start: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--ghs-perf-ink);
+}
+
+.objectives {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.objective {
+    padding-block: 5px;
+}
+
+.objectiveHead {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--spacers-dp8);
+    font-size: 12px;
+}
+
+.objectiveLabel {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--colors-grey700);
+}
+
+/* Objective 1 blue, 2 violet, 3 magenta - the same hues the app uses. */
+.dot {
+    inline-size: 8px;
+    block-size: 8px;
+    border-radius: 50%;
+    background: var(--ghs-accent);
+    flex: none;
+}
+
+.objectiveScore {
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.objectiveBar {
+    position: relative;
+    block-size: 5px;
+    border-radius: 3px;
+    background: var(--ghs-track);
+    margin-block-start: 4px;
+    overflow: hidden;
+}
+
+.objectiveFill {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    border-radius: 3px;
+    background: var(--ghs-accent);
+}
+
+.midpoint {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 50%;
+    inline-size: 1px;
+    background: var(--colors-white);
+    z-index: 1;
+}
+
+.footer {
+    margin-block-start: auto;
+    font-size: 11px;
+    color: var(--colors-grey600);
+    font-variant-numeric: tabular-nums;
+}

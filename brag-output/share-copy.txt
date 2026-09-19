@@ -1,0 +1,3 @@
+Introducing GHS Holistic Assessment: the Ghana Health Service's annual regional and district health sector assessment, with peer review, scoring and reporting, built on DHIS2.
+Its scoring engine reproduces the published 2025 Upper East workbook to nine decimal places.
+Built by Bigvalues IT Systems.
