@@ -22,6 +22,7 @@ import {
     PERIOD_STATUS_LABEL,
     STATUS,
 } from '../lib/constants.js'
+import { sourceLabel } from '../lib/dataSource.js'
 import {
     mappingForFramework,
     useIndicatorMapping,
@@ -58,7 +59,7 @@ export const AssessmentPage = ({ level }) => {
     const user = useCurrentUser()
     const { value: allMapping } = useIndicatorMapping()
     const { value: periods, loading: periodsLoading } = usePeriods()
-    const { fetchValues, loading: fetching } = useDhis2Values()
+    const { fetchValues, loading: fetching, dataSource } = useDhis2Values()
 
     const { orgUnits: regions } = useOrgUnitsForLevel(LEVEL.REGION)
     const { districts } = useDistrictsForRegion(regionId)
@@ -121,6 +122,7 @@ export const AssessmentPage = ({ level }) => {
             const { values, matched, requested } = await fetchValues({
                 mapping,
                 orgUnitId: orgUnit.id,
+                level,
                 year,
             })
             if (requested === 0) {
@@ -133,19 +135,33 @@ export const AssessmentPage = ({ level }) => {
                 return
             }
             mergeValues(values)
+            const from = sourceLabel(dataSource)
             notify(
-                i18n.t(
-                    'Fetched {{matched}} of {{requested}} mapped indicators',
-                    {
-                        matched,
-                        requested,
-                    }
-                )
+                from
+                    ? i18n.t(
+                          'Fetched {{matched}} of {{requested}} mapped indicators from {{from}}',
+                          {
+                              matched,
+                              requested,
+                              from,
+                              interpolation: { escapeValue: false },
+                          }
+                      )
+                    : i18n.t(
+                          'Fetched {{matched}} of {{requested}} mapped indicators',
+                          {
+                              matched,
+                              requested,
+                          }
+                      )
             )
         } catch (e) {
             notify(
+                // Raw, since React escapes text itself; i18next's own escaping
+                // would print a path or URL in the message as `&#x2F;`.
                 i18n.t('Could not fetch DHIS2 data — {{msg}}', {
                     msg: e.message,
+                    interpolation: { escapeValue: false },
                 }),
                 'critical'
             )

@@ -12,6 +12,7 @@ import React, { useState } from 'react'
 import { useSettings } from '../../lib/datastore.js'
 import { assessmentYears } from '../../lib/format.js'
 import styles from '../AdminPage.module.css'
+import DataSourceSection from './DataSourceSection.jsx'
 
 /**
  * The handful of instance-wide settings, stored under `settings`.
@@ -29,9 +30,14 @@ export const SettingsTab = () => {
 
     const set = (patch) => setDraft({ ...current, ...patch })
 
+    const notify = (message, tone = 'success') =>
+        setAlert({ message, tone, id: Date.now() })
+
     const handleSave = async () => {
         try {
-            await save(current)
+            // The data source is saved by its own section; a draft begun before
+            // connecting must not carry the old value back.
+            await save({ ...current, dataSource: settings?.dataSource ?? null })
             setDraft(null)
             setAlert({
                 message: i18n.t('Settings saved'),
@@ -108,6 +114,12 @@ export const SettingsTab = () => {
                     </Button>
                 )}
             </div>
+
+            <DataSourceSection
+                settings={settings}
+                save={save}
+                notify={notify}
+            />
 
             <NoticeBox title={i18n.t('The framework is not a setting')}>
                 {i18n.t(

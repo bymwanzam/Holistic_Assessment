@@ -527,6 +527,35 @@ fails. The `metadata` key of the export is an ordinary DHIS2 metadata payload,
 so `jq .metadata indicators.json` gives you something **Import/Export** in the UI
 will take.
 
+### Reading live from another instance
+
+The app can also read indicator values from another instance as they are
+needed, rather than from a snapshot. A national administrator connects the
+source on **Admin → Settings → Data source** by giving its URL (DHIMS by
+default) and a personal access token created on that instance. The app then
+creates a [DHIS2 route](https://docs.dhis2.org/en/develop/using-the-api/dhis-core-version-master/route.html)
+(`ghs-ha-data-source`) on its own instance, pointing at `<source>/api/**`. The
+route keeps the token on the server and relays requests to the source, so the
+token never reaches a browser and the source needs no CORS entry.
+
+Once a source is connected, *Fetch DHIS2 data* and the Mappings search both run
+against it, so the bindings in `indicator-ids.js` resolve by their DHIMS UIDs
+unchanged. The org unit being assessed is resolved first: by UID when the source
+has the same one (an instance cloned from DHIMS), otherwise by name through the
+same matcher as the prefill script ([`src/lib/orgUnitMatch.js`](src/lib/orgUnitMatch.js))
+and the same alias file. An org unit with no safe counterpart is reported, not
+guessed. **Disconnect** deletes the route along with its token.
+
+Requirements and cautions:
+
+- The Route API needs DHIS2 2.41 or later on the app's instance, and that
+  server must be able to reach the source. Recent versions only relay to hosts
+  allowed by `route.remote_servers_allowed` in `dhis.conf`, which defaults to
+  `https://*`, so an `http://` source has to be added there.
+- The route relays whatever the token allows, to every user holding
+  `GHS_ASSESSMENT_EDIT` or `GHS_ASSESSMENT_ADMIN`. Create the token restricted
+  to `GET` requests, on an account that can only read.
+
 ### Filling assessments from another instance
 
 If the app's instance is not the one holding the data — and the two share no
@@ -563,7 +592,7 @@ This is a snapshot, not a live link. Re-run it to refresh.
 **Org units are matched by name**, since the UIDs differ. Regions match 16/16.
 Districts are matched on (region, district), first exactly and then with the
 administrative suffix dropped, which gets most of the way; the rest are listed
-in [`scripts/org-unit-aliases.json`](scripts/org-unit-aliases.json). Only put a
+in [`src/framework/org-unit-aliases.json`](src/framework/org-unit-aliases.json). Only put a
 pair in that file when it is certainly the same place under another spelling.
 The near-misses that remain are district splits and renames — matching "Adansi
 North" to "Amansie South" because the strings look alike would file one
@@ -627,6 +656,8 @@ src/
     useAssessment.js       load, edit, score and auto-save one assessment
     useAutoSave.js         30-second auto-save
     useDhis2Values.js      analytics fetch and metadata search
+    dataSource.js          the optional remote data source, relayed through a DHIS2 route
+    orgUnitMatch.js        pairs org units across instances, shared with the prefill script
     useOrgUnits.js         region and district lookup
     useCurrentUser.js      authorities, assigned org units, and scopeOf
   components/              table, milestone panel, summary, chips, context bar

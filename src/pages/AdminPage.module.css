@@ -291,3 +291,14 @@
     flex-wrap: wrap;
     gap: var(--spacers-dp4);
 }
+
+/* The data source block on the Settings tab, set apart from the plain fields above it. */
+.dataSource {
+    margin-block: var(--spacers-dp24);
+    padding-block-start: var(--spacers-dp16);
+    border-block-start: 1px solid var(--colors-grey300);
+}
+
+.dataSource .formRow {
+    margin-block-start: var(--spacers-dp12);
+}

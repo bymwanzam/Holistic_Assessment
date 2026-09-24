@@ -19,7 +19,7 @@
  *
  * `--dry-run` reports what it would write without touching the datastore.
  * `--only <name>` restricts to org units whose name contains that text.
- * `--aliases <file>` overrides the default name map, `scripts/org-unit-aliases.json`.
+ * `--aliases <file>` overrides the default name map, `src/framework/org-unit-aliases.json`.
  *
  * This is a snapshot, not a live link: re-run it to refresh. It never
  * overwrites a figure somebody typed, and it skips any assessment that has
@@ -29,6 +29,10 @@
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
+import {
+    matchOrgUnits as matchUnits,
+    parseAliases,
+} from '../src/lib/orgUnitMatch.js'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 
@@ -43,7 +47,9 @@ const year = Number(value('year'))
 const level = (value('level') || 'REGION').toUpperCase()
 const dryRun = flag('dry-run')
 const only = value('only')
-const aliasFile = value('aliases') || join(HERE, 'org-unit-aliases.json')
+const aliasFile =
+    value('aliases') ||
+    join(HERE, '..', 'src', 'framework', 'org-unit-aliases.json')
 
 if (!Number.isFinite(year) || !['REGION', 'DISTRICT'].includes(level)) {
     console.error(
@@ -165,68 +171,14 @@ const chunk = (items, size) =>
         items.slice(i * size, i * size + size)
     )
 
-/*
- * The two instances name the same district differently - "Bekwai" against
- * "Bekwai Municipal", "Adansi Akrofuom" against "Akrofuom". Matching runs in
- * two passes: exact on the normalised name, then again with the administrative
- * suffix removed. A name that matches more than one candidate is never guessed
- * at; it is reported unmatched.
- */
-const SUFFIXES =
-    /\s+(municipal(ity)?|metropolitan|metropolis|metro|district|sub[- ]?district)$/
-
-const normalise = (name) =>
-    (name || '')
-        .toLowerCase()
-        .replace(/[^a-z0-9\s]/g, ' ')
-        .replace(/\s+/g, ' ')
-        .trim()
-
-const stripSuffix = (name) => {
-    let out = normalise(name)
-    let previous
-    do {
-        previous = out
-        out = out.replace(SUFFIXES, '').trim()
-    } while (out !== previous)
-    return out
-}
-
-const orgUnitKey = (unit, transform) =>
-    level === 'DISTRICT'
-        ? `${transform(unit.parent?.name)}|${transform(unit.name)}`
-        : transform(unit.name)
-
-/** Index org units by key, dropping any key that more than one unit claims. */
-const indexBy = (units, transform) => {
-    const index = new Map()
-    const clashes = new Set()
-    units.forEach((unit) => {
-        const key = orgUnitKey(unit, transform)
-        if (index.has(key)) {
-            clashes.add(key)
-        }
-        index.set(key, unit)
-    })
-    clashes.forEach((key) => index.delete(key))
-    return index
-}
-
 /**
- * Hand-curated name pairs for districts the two instances spell differently.
- * Deliberately never fuzzy: the near-misses that are left are district splits
- * and renames, and guessing at those would file one district's figures under
- * another. See `scripts/org-unit-aliases.json`.
+ * Name pairs for districts the two instances spell differently. Matching
+ * itself lives in `src/lib/orgUnitMatch.js`, shared with the app, so the
+ * script and the in-app fetch file a district under the same counterpart.
  */
 const loadAliases = () => {
     try {
-        const file = JSON.parse(readFileSync(aliasFile, 'utf8'))
-        return new Map(
-            Object.entries(file.districts || {}).map(([from, to]) => [
-                from.split('/').map(normalise).join('|'),
-                to.split('/').map(normalise).join('|'),
-            ])
-        )
+        return parseAliases(JSON.parse(readFileSync(aliasFile, 'utf8')))
     } catch (e) {
         if (e.code === 'ENOENT') {
             return new Map()
@@ -235,28 +187,11 @@ const loadAliases = () => {
     }
 }
 
-const matchOrgUnits = (sourceUnits, targetUnits) => {
-    const matched = []
-    const unmatched = []
-
-    const exact = indexBy(targetUnits, normalise)
-    const loose = indexBy(targetUnits, stripSuffix)
-    const aliases = level === 'DISTRICT' ? loadAliases() : new Map()
-
-    sourceUnits.forEach((source) => {
-        const aliased = aliases.get(orgUnitKey(source, normalise))
-        const target =
-            (aliased && (exact.get(aliased) || loose.get(aliased))) ||
-            exact.get(orgUnitKey(source, normalise)) ||
-            loose.get(orgUnitKey(source, stripSuffix))
-        if (target) {
-            matched.push({ source, target, viaAlias: Boolean(aliased) })
-        } else {
-            unmatched.push(source)
-        }
+const matchOrgUnits = (sourceUnits, targetUnits) =>
+    matchUnits(sourceUnits, targetUnits, {
+        byParent: level === 'DISTRICT',
+        aliases: level === 'DISTRICT' ? loadAliases() : new Map(),
     })
-    return { matched, unmatched }
-}
 
 const listOrgUnits = (prefix) =>
     call(
