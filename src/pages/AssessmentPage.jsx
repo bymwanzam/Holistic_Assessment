@@ -16,8 +16,17 @@ import MilestonePanel from '../components/MilestonePanel.jsx'
 import StatusTag from '../components/StatusTag.jsx'
 import SummaryPanel from '../components/SummaryPanel.jsx'
 import { useAppState } from '../lib/AppState.jsx'
-import { LEVEL, MIN_SUBMIT_COMPLETION, STATUS } from '../lib/constants.js'
-import { mappingForFramework, useIndicatorMapping } from '../lib/datastore.js'
+import {
+    LEVEL,
+    MIN_SUBMIT_COMPLETION,
+    PERIOD_STATUS_LABEL,
+    STATUS,
+} from '../lib/constants.js'
+import {
+    mappingForFramework,
+    useIndicatorMapping,
+    usePeriods,
+} from '../lib/datastore.js'
 import { fmtPercent, fmtRelative } from '../lib/format.js'
 import { useAssessment } from '../lib/useAssessment.js'
 import { useUnsavedWarning } from '../lib/useAutoSave.js'
@@ -33,6 +42,8 @@ import {
     canEditIndicator,
     flaggedCodes,
     isOwnerEditable,
+    periodAllowsEditing,
+    periodOf,
     reopenAsDraft,
     rejectAllAdjustments,
     submitBlockers,
@@ -46,6 +57,7 @@ export const AssessmentPage = ({ level }) => {
         useAppState()
     const user = useCurrentUser()
     const { value: allMapping } = useIndicatorMapping()
+    const { value: periods, loading: periodsLoading } = usePeriods()
     const { fetchValues, loading: fetching } = useDhis2Values()
 
     const { orgUnits: regions } = useOrgUnitsForLevel(LEVEL.REGION)
@@ -82,13 +94,24 @@ export const AssessmentPage = ({ level }) => {
         [allMapping, assessment?.frameworkId]
     )
 
+    // Whether the year is open decides editing and submission. Until periods
+    // have loaded nothing is editable, rather than briefly open by default.
+    const period = periodOf(periods, year)
     const editable = Boolean(
-        user.canEdit && assessment && isOwnerEditable(assessment.status)
+        user.canEdit &&
+        assessment &&
+        !periodsLoading &&
+        isOwnerEditable(assessment.status, period)
     )
     const flagged = assessment ? flaggedCodes(assessment) : []
     const blockers = assessment
-        ? submitBlockers(assessment, result?.completion ?? 0)
+        ? submitBlockers(assessment, result?.completion ?? 0, period)
         : []
+    const canSubmitNow =
+        Boolean(assessment) &&
+        user.canEdit &&
+        !periodsLoading &&
+        blockers.length === 0
 
     const notify = (message, tone = 'success') =>
         setAlert({ message, tone, id: Date.now() })
@@ -143,7 +166,8 @@ export const AssessmentPage = ({ level }) => {
             const next = submitForReview(
                 assessment,
                 user.user,
-                result?.completion ?? 0
+                result?.completion ?? 0,
+                period
             )
             await saveNow(next)
             notify(i18n.t('Submitted for peer review'))
@@ -262,11 +286,7 @@ export const AssessmentPage = ({ level }) => {
                 >
                     {i18n.t('Save draft')}
                 </Button>
-                <Button
-                    small
-                    disabled={!assessment || blockers.length > 0}
-                    onClick={handleSubmit}
-                >
+                <Button small disabled={!canSubmitNow} onClick={handleSubmit}>
                     {assessment?.status === STATUS.REVISION
                         ? i18n.t('Resubmit for review')
                         : i18n.t('Submit for review')}
@@ -407,6 +427,29 @@ export const AssessmentPage = ({ level }) => {
                         </div>
                     )}
 
+                    {!periodsLoading && !periodAllowsEditing(period) && (
+                        <div className={styles.notice}>
+                            <NoticeBox
+                                warning
+                                title={i18n.t(
+                                    'The {{year}} period is {{status}}',
+                                    {
+                                        year,
+                                        status: (
+                                            PERIOD_STATUS_LABEL[
+                                                period.status
+                                            ] || period.status
+                                        ).toLowerCase(),
+                                    }
+                                )}
+                            >
+                                {i18n.t(
+                                    'Assessments for this year can no longer be edited or submitted.'
+                                )}
+                            </NoticeBox>
+                        </div>
+                    )}
+
                     {assessment.status === STATUS.REVISION && (
                         <div className={styles.notice}>
                             <NoticeBox warning title={i18n.t('Revision mode')}>
@@ -478,8 +521,12 @@ export const AssessmentPage = ({ level }) => {
                                         mapping={mapping}
                                         mode="entry"
                                         canEditCode={(code) =>
-                                            user.canEdit &&
-                                            canEditIndicator(assessment, code)
+                                            editable &&
+                                            canEditIndicator(
+                                                assessment,
+                                                code,
+                                                period
+                                            )
                                         }
                                         reviewIndicators={
                                             assessment.review?.status ===

@@ -1,5 +1,10 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import { assessmentKey, emptyAssessment, useDataStore } from './datastore.js'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import {
+    assessmentKey,
+    emptyAssessment,
+    recordKey,
+    useDataStore,
+} from './datastore.js'
 import { scoreAssessment } from './scoring.js'
 import { useAutoSave } from './useAutoSave.js'
 import { useScoringFramework } from './useScoringFramework.js'
@@ -20,10 +25,22 @@ export const useAssessment = ({ year, orgUnit, level, autoSave = true }) => {
     const [assessment, setAssessment] = useState(null)
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState(null)
+    // The key whose read is in flight, so a slow response for an org unit the
+    // user has already left is dropped instead of shown under the new one.
+    const loadingKey = useRef(null)
+    // Read through a ref: permissions arrive after the first render, and that
+    // alone should not re-read the record.
+    const autoSaveEnabled = useRef(autoSave)
+    useEffect(() => {
+        autoSaveEnabled.current = autoSave
+    }, [autoSave])
 
     const save = useCallback(
         async (next) => {
-            if (!key || !next) {
+            // The record's own key wins over the current selection: an autosave
+            // that fires mid-switch must not write one unit's data over another.
+            const target = recordKey(next) || key
+            if (!target || !next) {
                 return
             }
             const stamped = {
@@ -31,7 +48,7 @@ export const useAssessment = ({ year, orgUnit, level, autoSave = true }) => {
                 updatedAt: new Date().toISOString(),
                 createdAt: next.createdAt || new Date().toISOString(),
             }
-            await store.write(key, stamped)
+            await store.write(target, stamped)
         },
         [key, store]
     )
@@ -41,28 +58,47 @@ export const useAssessment = ({ year, orgUnit, level, autoSave = true }) => {
         save,
         enabled: autoSave && Boolean(key),
     })
-    const { reset: resetAutoSave, markSaved } = autoSaver
+    const { reset: resetAutoSave, markSaved, flush } = autoSaver
 
     const load = useCallback(async () => {
-        if (!key) {
-            setAssessment(null)
+        loadingKey.current = key
+        setLoading(Boolean(key))
+        setError(null)
+        // Unsaved edits to the record being left are written to that record
+        // before it is dropped, rather than lost on switching org unit.
+        if (autoSaveEnabled.current) {
+            await flush()
+        }
+        if (loadingKey.current !== key) {
             return
         }
-        setLoading(true)
-        setError(null)
+        // Clear the previous record at once, so nothing can edit or autosave
+        // it while the next one is being read.
+        resetAutoSave(null)
+        setAssessment(null)
+        if (!key) {
+            return
+        }
         try {
             const stored = await store.read(key)
+            if (loadingKey.current !== key) {
+                return
+            }
             const record = stored || emptyAssessment({ year, orgUnit, level })
-            setAssessment(record)
             resetAutoSave(record)
+            setAssessment(record)
         } catch (e) {
-            setError(e)
+            if (loadingKey.current === key) {
+                setError(e)
+            }
         } finally {
-            setLoading(false)
+            if (loadingKey.current === key) {
+                setLoading(false)
+            }
         }
         // `orgUnit` is a fresh object each render; `key` already captures its id.
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [key, store, year, level, resetAutoSave])
+    }, [key, store, year, level, resetAutoSave, flush])
 
     useEffect(() => {
         load()

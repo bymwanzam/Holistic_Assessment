@@ -16,6 +16,7 @@ import { builtinIdsFor } from '../framework/indicator-ids.js'
 import { AUTH_ADMIN, AUTH_EDIT, LEVEL, NAMESPACE, STATUS } from './constants.js'
 import {
     assessmentKey,
+    recordKey,
     emptyAssessment,
     mappingForFramework,
     storedMappingForFramework,
@@ -38,6 +39,29 @@ const DISTRICT_ENTRY = {
 describe('assessmentKey', () => {
     it('is stable and namespaced by year and org unit', () => {
         expect(assessmentKey(2025, 'Ou12345')).toBe('assessment-2025-Ou12345')
+    })
+})
+
+describe('recordKey', () => {
+    it('keys a record by its own year and org unit', () => {
+        expect(recordKey({ year: 2025, orgUnit: { id: 'Ou12345' } })).toBe(
+            'assessment-2025-Ou12345'
+        )
+    })
+
+    it('agrees with the key the record was created under', () => {
+        const record = emptyAssessment({
+            year: 2024,
+            orgUnit: { id: 'Dist001', displayName: 'Bolga' },
+            level: LEVEL.DISTRICT,
+        })
+        expect(recordKey(record)).toBe(assessmentKey(2024, 'Dist001'))
+    })
+
+    it('is null when the record cannot say where it belongs', () => {
+        expect(recordKey(null)).toBeNull()
+        expect(recordKey({ year: 2025, orgUnit: null })).toBeNull()
+        expect(recordKey({ orgUnit: { id: 'Ou12345' } })).toBeNull()
     })
 })
 

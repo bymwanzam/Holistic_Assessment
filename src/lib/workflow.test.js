@@ -294,6 +294,16 @@ describe('assessment periods', () => {
         expect(blockers[1]).toContain('not open for submission')
     })
 
+    it('refuses to submit into a closed year even when called directly', () => {
+        const period = { status: PERIOD_STATUS.CLOSED }
+        expect(() => submitForReview(draft(), user, 1, period)).toThrow()
+        expect(
+            submitForReview(draft(), user, 1, {
+                status: PERIOD_STATUS.OPEN,
+            }).status
+        ).toBe(STATUS.SUBMITTED)
+    })
+
     it('never lets an open period unlock an already-submitted assessment', () => {
         const submitted = draft({ status: STATUS.SUBMITTED })
         const period = { status: PERIOD_STATUS.OPEN }

@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2026-09-17T07:10:14.436Z\n"
-"PO-Revision-Date: 2026-09-17T07:10:14.436Z\n"
+"POT-Creation-Date: 2026-09-24T17:58:40.229Z\n"
+"PO-Revision-Date: 2026-09-24T17:58:40.229Z\n"
 
 msgid "Dashboard"
 msgstr "Dashboard"
@@ -46,6 +46,33 @@ msgstr "© {{year}} Bigvalues IT Systems"
 
 msgid "Version {{version}} (Build {{build}})"
 msgstr "Version {{version}} (Build {{build}})"
+
+msgid "Not configured"
+msgstr "Not configured"
+
+msgid "Set a year and organisation unit for this dashboard item."
+msgstr "Set a year and organisation unit for this dashboard item."
+
+msgid "Could not load"
+msgstr "Could not load"
+
+msgid "No assessment"
+msgstr "No assessment"
+
+msgid "No assessment has been saved for {{year}}."
+msgstr "No assessment has been saved for {{year}}."
+
+msgid "Assessment"
+msgstr "Assessment"
+
+msgid "Performance score"
+msgstr "Performance score"
+
+msgid "Objective {{n}}"
+msgstr "Objective {{n}}"
+
+msgid "{{pct}} complete · raw {{score}} of {{max}}"
+msgstr "{{pct}} complete · raw {{score}} of {{max}}"
 
 msgid "Assessment year"
 msgstr "Assessment year"
@@ -178,9 +205,6 @@ msgstr "{{answered}} of {{total}} rows complete ({{pct}})"
 
 msgid "Objective scores"
 msgstr "Objective scores"
-
-msgid "Objective {{n}}"
-msgstr "Objective {{n}}"
 
 msgid "{{answered}}/{{total}} complete"
 msgstr "{{answered}}/{{total}} complete"
@@ -331,562 +355,29 @@ msgid_plural "{{count}} accepted"
 msgstr[0] "{{count}} accepted"
 msgstr[1] "{{count}} accepted"
 
-msgid "Could not load the audit trail"
-msgstr "Could not load the audit trail"
-
-msgid "Nothing recorded yet"
-msgstr "Nothing recorded yet"
-
-msgid ""
-"No assessment for {{year}} has any history. Entries appear as assessments "
-"are created, submitted and reviewed."
-msgstr ""
-"No assessment for {{year}} has any history. Entries appear as assessments "
-"are created, submitted and reviewed."
-
-msgid "Audit trail for {{year}}"
-msgstr "Audit trail for {{year}}"
-
-msgid "Showing the most recent {{limit}} of {{total}} events."
-msgstr "Showing the most recent {{limit}} of {{total}} events."
-
-msgid "{{total}} events."
-msgstr "{{total}} events."
-
-msgid "When"
-msgstr "When"
-
-msgid "Organisation unit"
-msgstr "Organisation unit"
-
-msgid "Action"
-msgstr "Action"
-
-msgid "By"
-msgstr "By"
-
-msgid "Detail"
-msgstr "Detail"
-
-msgid "Backed up {{count}} keys"
-msgid_plural "Backed up {{count}} keys"
-msgstr[0] "Backed up {{count}} keys"
-msgstr[1] "Backed up {{count}} keys"
-
-msgid "Backup"
-msgstr "Backup"
-
-msgid ""
-"Downloads every key in the {{namespace}} datastore namespace as one JSON "
-"file — all assessments, the indicator mapping, the settings and the peer "
-"pairings."
-msgstr ""
-"Downloads every key in the {{namespace}} datastore namespace as one JSON "
-"file — all assessments, the indicator mapping, the settings and the peer "
-"pairings."
-
-msgid "Download backup"
-msgstr "Download backup"
-
-msgid "Restoring is done deliberately"
-msgstr "Restoring is done deliberately"
-
-msgid ""
-"There is no restore button here on purpose — writing a backup back over a "
-"live namespace would overwrite work in progress. Restore through the DHIS2 "
-"datastore API, key by key, once you are sure what you are replacing."
-msgstr ""
-"There is no restore button here on purpose — writing a backup back over a "
-"live namespace would overwrite work in progress. Restore through the DHIS2 "
-"datastore API, key by key, once you are sure what you are replacing."
-
-msgid "Assessment exports"
-msgstr "Assessment exports"
-
-msgid ""
-"Per-year CSV exports of the league table and the full indicator detail live "
-"on the Reports page, where a year and level can be chosen first."
-msgstr ""
-"Per-year CSV exports of the league table and the full indicator detail live "
-"on the Reports page, where a year and level can be chosen first."
-
-msgid "Mapping saved"
-msgstr "Mapping saved"
-
-msgid "{{mapped}} of {{total}} indicators mapped"
-msgstr "{{mapped}} of {{total}} indicators mapped"
-
-msgid "Save mapping"
-msgstr "Save mapping"
-
-msgid "Discard changes"
-msgstr "Discard changes"
-
-msgid "How mapping works"
-msgstr "How mapping works"
-
-msgid ""
-"Bind an indicator to a DHIS2 indicator or data element and the assessment "
-"page will fetch its current and previous year values from analytics. "
-"Unmapped indicators remain manual entry. Rows marked \"Built in\" are "
-"already bound to the GHS-HA indicators this app ships with; rebinding or "
-"clearing one overrides it."
-msgstr ""
-"Bind an indicator to a DHIS2 indicator or data element and the assessment "
-"page will fetch its current and previous year values from analytics. "
-"Unmapped indicators remain manual entry. Rows marked \"Built in\" are "
-"already bound to the GHS-HA indicators this app ships with; rebinding or "
-"clearing one overrides it."
-
-msgid "Assessment tool"
-msgstr "Assessment tool"
-
-msgid "Regional (94 indicators)"
-msgstr "Regional (94 indicators)"
-
-msgid "District (93 indicators)"
-msgstr "District (93 indicators)"
-
-msgid "Filter indicators"
-msgstr "Filter indicators"
-
-msgid "Search by name or code"
-msgstr "Search by name or code"
-
-msgid "Objective"
-msgstr "Objective"
-
-msgid "All objectives"
-msgstr "All objectives"
-
-msgid "Mapping status"
-msgstr "Mapping status"
-
-msgid "All"
-msgstr "All"
-
-msgid "Mapped"
-msgstr "Mapped"
-
-msgid "Unmapped"
-msgstr "Unmapped"
-
-msgid "Mapped to"
-msgstr "Mapped to"
-
-msgid "Built in"
-msgstr "Built in"
-
-msgid "Custom"
-msgstr "Custom"
-
-msgid "Manual entry"
-msgstr "Manual entry"
-
-msgid "Cancel"
-msgstr "Cancel"
-
-msgid "Map"
-msgstr "Map"
-
-msgid "Clear"
-msgstr "Clear"
-
-msgid "Search DHIS2 metadata"
-msgstr "Search DHIS2 metadata"
-
-msgid "Type at least 2 characters"
-msgstr "Type at least 2 characters"
-
-msgid "Searching…"
-msgstr "Searching…"
-
-msgid "Regional"
-msgstr "Regional"
-
-msgid "Could not load assessments"
-msgstr "Could not load assessments"
-
-msgid "{{year}} assessments"
-msgstr "{{year}} assessments"
-
-msgid "Nothing saved yet"
-msgstr "Nothing saved yet"
-
-msgid ""
-"No assessment has been saved for {{year}}. Counts appear here as regions "
-"and districts begin."
-msgstr ""
-"No assessment has been saved for {{year}}. Counts appear here as regions "
-"and districts begin."
-
-msgid "DHIS2 coverage"
-msgstr "DHIS2 coverage"
-
-msgid ""
-"How many rows of each tool are bound to a DHIS2 indicator. Unbound rows "
-"stay manual entry."
-msgstr ""
-"How many rows of each tool are bound to a DHIS2 indicator. Unbound rows "
-"stay manual entry."
-
-msgid "Tool"
-msgstr "Tool"
-
-msgid "Bound"
-msgstr "Bound"
-
-msgid "Rows"
-msgstr "Rows"
-
-msgid "Coverage"
-msgstr "Coverage"
-
-msgid "An org unit cannot review itself."
-msgstr "An org unit cannot review itself."
-
-msgid "{{reviewer}} will review {{assessed}}"
-msgstr "{{reviewer}} will review {{assessed}}"
-
-msgid "Pairing removed"
-msgstr "Pairing removed"
-
-msgid "Peer review pairings for {{year}}"
-msgstr "Peer review pairings for {{year}}"
-
-msgid ""
-"Each pairing says that one org unit reviews another. Pairings are held per "
-"year, so last cycle is left intact when this one is redrawn."
-msgstr ""
-"Each pairing says that one org unit reviews another. Pairings are held per "
-"year, so last cycle is left intact when this one is redrawn."
-
-msgid "Level"
-msgstr "Level"
-
-msgid "Reviews"
-msgstr "Reviews"
-
-msgid "Add pairing"
-msgstr "Add pairing"
-
-msgid "No pairings yet"
-msgstr "No pairings yet"
-
-msgid "Nothing is paired for {{year}}. Add a pairing above."
-msgstr "Nothing is paired for {{year}}. Add a pairing above."
-
-msgid "Remove"
-msgstr "Remove"
-
-msgid "Period created for {{year}}"
-msgstr "Period created for {{year}}"
-
-msgid "{{year}} is now {{status}}"
-msgstr "{{year}} is now {{status}}"
+msgid "Overview"
+msgstr "Overview"
 
 msgid "Periods"
 msgstr "Periods"
 
-msgid "Year"
-msgstr "Year"
-
-msgid "Create period"
-msgstr "Create period"
-
-msgid "No periods recorded"
-msgstr "No periods recorded"
-
-msgid ""
-"Every year is open until a period is created for it. Create one for the "
-"year you want to control; the others are unaffected."
-msgstr ""
-"Every year is open until a period is created for it. Create one for the "
-"year you want to control; the others are unaffected."
-
-msgid "Status"
-msgstr "Status"
-
-msgid "What it means"
-msgstr "What it means"
-
-msgid "Last changed"
-msgstr "Last changed"
-
-msgid "Change to"
-msgstr "Change to"
-
-msgid "Read-only outside national"
-msgstr "Read-only outside national"
-
-msgid ""
-"A period decides when the whole country submits, so it is opened and closed "
-"nationally. It is shown here because it governs whether your own "
-"assessments can be submitted."
-msgstr ""
-"A period decides when the whole country submits, so it is opened and closed "
-"nationally. It is shown here because it governs whether your own "
-"assessments can be submitted."
-
-msgid "A closed year is not a locked one"
-msgstr "A closed year is not a locked one"
-
-msgid ""
-"Closing a year stops new submissions but leaves data entry alone, so work "
-"in progress is not lost the moment a deadline passes. Locking stops editing "
-"too. Neither ever blocks a reviewer from finishing a review already under "
-"way — a review that could not be completed would strand the assessment it "
-"belongs to."
-msgstr ""
-"Closing a year stops new submissions but leaves data entry alone, so work "
-"in progress is not lost the moment a deadline passes. Locking stops editing "
-"too. Neither ever blocks a reviewer from finishing a review already under "
-"way — a review that could not be completed would strand the assessment it "
-"belongs to."
-
-msgid "Regions"
-msgstr "Regions"
-
-msgid "{{count}} regions"
-msgid_plural "{{count}} regions"
-msgstr[0] "{{count}} regions"
-msgstr[1] "{{count}} regions"
-
-msgid "{{count}} districts"
-msgid_plural "{{count}} districts"
-msgstr[0] "{{count}} districts"
-msgstr[1] "{{count}} districts"
-
-msgid "Districts"
-msgstr "Districts"
-
-msgid "Districts assessed"
-msgstr "Districts assessed"
-
-msgid "Regional assessment"
-msgstr "Regional assessment"
-
-msgid "Stored"
-msgstr "Stored"
-
-msgid "None"
-msgstr "None"
-
-msgid "{{count}} districts have no parent region"
-msgid_plural "{{count}} districts have no parent region"
-msgstr[0] "{{count}} districts have no parent region"
-msgstr[1] "{{count}} districts have no parent region"
-
-msgid ""
-"A district DHIS2 reports without a parent cannot be rolled up into a "
-"region, so it will be missing from the regional dashboard. Correct the "
-"hierarchy in the Maintenance app."
-msgstr ""
-"A district DHIS2 reports without a parent cannot be rolled up into a "
-"region, so it will be missing from the regional dashboard. Correct the "
-"hierarchy in the Maintenance app."
-
-msgid "Read from DHIS2, not stored here"
-msgstr "Read from DHIS2, not stored here"
-
-msgid ""
-"Regions and districts are DHIS2 metadata. The app reads them fresh every "
-"time rather than keeping its own copy, so changes made in the Maintenance "
-"app appear here immediately — and there is no second list to fall out of "
-"step."
-msgstr ""
-"Regions and districts are DHIS2 metadata. The app reads them fresh every "
-"time rather than keeping its own copy, so changes made in the Maintenance "
-"app appear here immediately — and there is no second list to fall out of "
-"step."
-
-msgid "Settings saved"
-msgstr "Settings saved"
-
-msgid "Settings"
-msgstr "Settings"
-
-msgid "Default assessment year"
-msgstr "Default assessment year"
-
-msgid "Organisation name"
-msgstr "Organisation name"
-
-msgid "Save settings"
-msgstr "Save settings"
-
-msgid "The framework is not a setting"
-msgstr "The framework is not a setting"
-
-msgid ""
-"Which tool an assessment uses is decided by the level being assessed - "
-"regional or district - not by a setting, because the two are different "
-"instruments and a record must keep the one it was scored against."
-msgstr ""
-"Which tool an assessment uses is decided by the level being assessed - "
-"regional or district - not by a setting, because the two are different "
-"instruments and a record must keep the one it was scored against."
-
-msgid "Regional tool"
-msgstr "Regional tool"
-
-msgid "District tool"
-msgstr "District tool"
-
-msgid "Targets saved for {{year}}"
-msgstr "Targets saved for {{year}}"
-
-msgid "No targets are stored for {{year}}"
-msgstr "No targets are stored for {{year}}"
-
-msgid "Copied {{count}} targets from {{year}}. Save to keep them."
-msgid_plural "Copied {{count}} targets from {{year}}. Save to keep them."
-msgstr[0] "Copied {{count}} targets from {{year}}. Save to keep them."
-msgstr[1] "Copied {{count}} targets from {{year}}. Save to keep them."
-
-msgid "Code"
-msgstr "Code"
-
-msgid "Direction"
-msgstr "Direction"
-
-msgid "Default target"
-msgstr "Default target"
-
-msgid "Default lower"
-msgstr "Default lower"
-
-msgid "Default upper"
-msgstr "Default upper"
-
-msgid "Lower"
-msgstr "Lower"
-
-msgid "Upper"
-msgstr "Upper"
-
-msgid "That file has no rows"
-msgstr "That file has no rows"
-
-msgid "That file has no Code column"
-msgstr "That file has no Code column"
-
-msgid "{{matched}} rows read, {{skipped}} ignored. Review and save."
-msgstr "{{matched}} rows read, {{skipped}} ignored. Review and save."
-
 msgid "Targets"
 msgstr "Targets"
-
-msgid "{{count}} of {{total}} rows overridden"
-msgid_plural "{{count}} of {{total}} rows overridden"
-msgstr[0] "{{count}} of {{total}} rows overridden"
-msgstr[1] "{{count}} of {{total}} rows overridden"
-
-msgid "Save targets"
-msgstr "Save targets"
-
-msgid "Copy from {{year}}"
-msgstr "Copy from {{year}}"
-
-msgid "Reset to defaults"
-msgstr "Reset to defaults"
-
-msgid "Import CSV"
-msgstr "Import CSV"
-
-msgid "Export CSV"
-msgstr "Export CSV"
-
-msgid "Read-only at district level"
-msgstr "Read-only at district level"
-
-msgid ""
-"These targets apply to every district on the tool, so they are set "
-"nationally or regionally. Rows whose target is genuinely set locally are "
-"marked \"varies\" below and are edited on the assessment itself."
-msgstr ""
-"These targets apply to every district on the tool, so they are set "
-"nationally or regionally. Rows whose target is genuinely set locally are "
-"marked \"varies\" below and are edited on the assessment itself."
-
-msgid "Default"
-msgstr "Default"
-
-msgid "Overridden"
-msgstr "Overridden"
-
-msgid "varies"
-msgstr "varies"
-
-msgid "Set"
-msgstr "Set"
-
-msgid "National"
-msgstr "National"
-
-msgid "Could not load users"
-msgstr "Could not load users"
-
-msgid "Users"
-msgstr "Users"
-
-msgid "{{count}} users can use this app"
-msgid_plural "{{count}} users can use this app"
-msgstr[0] "{{count}} users can use this app"
-msgstr[1] "{{count}} users can use this app"
-
-msgid "Nobody holds the app authorities"
-msgstr "Nobody holds the app authorities"
-
-msgid "User"
-msgstr "User"
-
-msgid "Username"
-msgstr "Username"
-
-msgid "Can enter data"
-msgstr "Can enter data"
-
-msgid "Can review"
-msgstr "Can review"
-
-msgid "Can administer"
-msgstr "Can administer"
-
-msgid "Through role"
-msgstr "Through role"
-
-msgid "Superuser"
-msgstr "Superuser"
-
-msgid "Yes"
-msgstr "Yes"
-
-msgid "No"
-msgstr "No"
-
-msgid "Granted in DHIS2, shown here"
-msgstr "Granted in DHIS2, shown here"
-
-msgid ""
-"Authorities are granted to user roles in the DHIS2 Users app, not here. A "
-"user with no org unit at all gets the narrowest view rather than the "
-"widest, so an account that reaches the app but sees nothing is usually one "
-"with no organisation unit assigned."
-msgstr ""
-"Authorities are granted to user roles in the DHIS2 Users app, not here. A "
-"user with no org unit at all gets the narrowest view rather than the "
-"widest, so an account that reaches the app but sees nothing is usually one "
-"with no organisation unit assigned."
-
-msgid "Overview"
-msgstr "Overview"
 
 msgid "Mappings"
 msgstr "Mappings"
 
+msgid "Regions"
+msgstr "Regions"
+
 msgid "Pairings"
 msgstr "Pairings"
+
+msgid "Users"
+msgstr "Users"
+
+msgid "Settings"
+msgstr "Settings"
 
 msgid "Data"
 msgstr "Data"
@@ -1019,6 +510,12 @@ msgstr "The reviewer found significant data quality issues."
 msgid "Reopen as draft"
 msgstr "Reopen as draft"
 
+msgid "The {{year}} period is {{status}}"
+msgstr "The {{year}} period is {{status}}"
+
+msgid "Assessments for this year can no longer be edited or submitted."
+msgstr "Assessments for this year can no longer be edited or submitted."
+
 msgid "Revision mode"
 msgstr "Revision mode"
 
@@ -1048,6 +545,9 @@ msgstr ""
 msgid "Objective {{n}} ({{done}}/{{total}})"
 msgstr "Objective {{n}} ({{done}}/{{total}})"
 
+msgid "Status"
+msgstr "Status"
+
 msgid "Overall score"
 msgstr "Overall score"
 
@@ -1056,6 +556,12 @@ msgstr "Performance"
 
 msgid "Could not load the dashboard"
 msgstr "Could not load the dashboard"
+
+msgid "National"
+msgstr "National"
+
+msgid "Regional"
+msgstr "Regional"
 
 msgid "{{year}} {{level}} Assessment Dashboard"
 msgstr "{{year}} {{level}} Assessment Dashboard"
@@ -1086,6 +592,9 @@ msgstr[1] "Average of {{count}} regions assessed"
 
 msgid "Regions completed"
 msgstr "Regions completed"
+
+msgid "Districts"
+msgstr "Districts"
 
 msgid "Districts completed"
 msgstr "Districts completed"
@@ -1486,6 +995,9 @@ msgstr ""
 msgid "Objective weights"
 msgstr "Objective weights"
 
+msgid "Objective"
+msgstr "Objective"
+
 msgid "Indicators"
 msgstr "Indicators"
 
@@ -1521,6 +1033,9 @@ msgstr "Assessment structure"
 
 msgid "Focus area"
 msgstr "Focus area"
+
+msgid "Rows"
+msgstr "Rows"
 
 msgid "Weight"
 msgstr "Weight"
@@ -1602,6 +1117,9 @@ msgstr "DHIS2 authority"
 
 msgid "Grants"
 msgstr "Grants"
+
+msgid "None"
+msgstr "None"
 
 msgid "Read-only access to assessments"
 msgstr "Read-only access to assessments"
@@ -1850,6 +1368,12 @@ msgstr "Editing"
 msgid "Submission"
 msgstr "Submission"
 
+msgid "Yes"
+msgstr "Yes"
+
+msgid "No"
+msgstr "No"
+
 msgid "A year with no period is open"
 msgstr "A year with no period is open"
 
@@ -2024,9 +1548,6 @@ msgstr "Quick start"
 msgid "Workflow"
 msgstr "Workflow"
 
-msgid "Assessment"
-msgstr "Assessment"
-
 msgid "Scoring"
 msgstr "Scoring"
 
@@ -2069,6 +1590,9 @@ msgstr "Review saved"
 
 msgid "Peer Review"
 msgstr "Peer Review"
+
+msgid "Regional assessment"
+msgstr "Regional assessment"
 
 msgid "District assessment"
 msgstr "District assessment"
@@ -2158,26 +1682,508 @@ msgstr "Export PDF"
 msgid "Export Excel"
 msgstr "Export Excel"
 
-msgid "Not configured"
-msgstr "Not configured"
+msgid "Export CSV"
+msgstr "Export CSV"
 
-msgid "Set a year and organisation unit for this dashboard item."
-msgstr "Set a year and organisation unit for this dashboard item."
+msgid "Could not load the audit trail"
+msgstr "Could not load the audit trail"
 
-msgid "Could not load"
-msgstr "Could not load"
+msgid "Nothing recorded yet"
+msgstr "Nothing recorded yet"
 
-msgid "No assessment"
-msgstr "No assessment"
+msgid ""
+"No assessment for {{year}} has any history. Entries appear as assessments "
+"are created, submitted and reviewed."
+msgstr ""
+"No assessment for {{year}} has any history. Entries appear as assessments "
+"are created, submitted and reviewed."
 
-msgid "No assessment has been saved for {{year}}."
-msgstr "No assessment has been saved for {{year}}."
+msgid "Audit trail for {{year}}"
+msgstr "Audit trail for {{year}}"
 
-msgid "Performance score"
-msgstr "Performance score"
+msgid "Showing the most recent {{limit}} of {{total}} events."
+msgstr "Showing the most recent {{limit}} of {{total}} events."
 
-msgid "{{pct}} complete · raw {{score}} of {{max}}"
-msgstr "{{pct}} complete · raw {{score}} of {{max}}"
+msgid "{{total}} events."
+msgstr "{{total}} events."
+
+msgid "When"
+msgstr "When"
+
+msgid "Organisation unit"
+msgstr "Organisation unit"
+
+msgid "Action"
+msgstr "Action"
+
+msgid "By"
+msgstr "By"
+
+msgid "Detail"
+msgstr "Detail"
+
+msgid "Backed up {{count}} keys"
+msgid_plural "Backed up {{count}} keys"
+msgstr[0] "Backed up {{count}} keys"
+msgstr[1] "Backed up {{count}} keys"
+
+msgid "Backup"
+msgstr "Backup"
+
+msgid ""
+"Downloads every key in the {{namespace}} datastore namespace as one JSON "
+"file — all assessments, the indicator mapping, the settings and the peer "
+"pairings."
+msgstr ""
+"Downloads every key in the {{namespace}} datastore namespace as one JSON "
+"file — all assessments, the indicator mapping, the settings and the peer "
+"pairings."
+
+msgid "Download backup"
+msgstr "Download backup"
+
+msgid "Restoring is done deliberately"
+msgstr "Restoring is done deliberately"
+
+msgid ""
+"There is no restore button here on purpose — writing a backup back over a "
+"live namespace would overwrite work in progress. Restore through the DHIS2 "
+"datastore API, key by key, once you are sure what you are replacing."
+msgstr ""
+"There is no restore button here on purpose — writing a backup back over a "
+"live namespace would overwrite work in progress. Restore through the DHIS2 "
+"datastore API, key by key, once you are sure what you are replacing."
+
+msgid "Assessment exports"
+msgstr "Assessment exports"
+
+msgid ""
+"Per-year CSV exports of the league table and the full indicator detail live "
+"on the Reports page, where a year and level can be chosen first."
+msgstr ""
+"Per-year CSV exports of the league table and the full indicator detail live "
+"on the Reports page, where a year and level can be chosen first."
+
+msgid "Mapping saved"
+msgstr "Mapping saved"
+
+msgid "{{mapped}} of {{total}} indicators mapped"
+msgstr "{{mapped}} of {{total}} indicators mapped"
+
+msgid "Save mapping"
+msgstr "Save mapping"
+
+msgid "Discard changes"
+msgstr "Discard changes"
+
+msgid "How mapping works"
+msgstr "How mapping works"
+
+msgid ""
+"Bind an indicator to a DHIS2 indicator or data element and the assessment "
+"page will fetch its current and previous year values from analytics. "
+"Unmapped indicators remain manual entry. Rows marked \"Built in\" are "
+"already bound to the GHS-HA indicators this app ships with; rebinding or "
+"clearing one overrides it."
+msgstr ""
+"Bind an indicator to a DHIS2 indicator or data element and the assessment "
+"page will fetch its current and previous year values from analytics. "
+"Unmapped indicators remain manual entry. Rows marked \"Built in\" are "
+"already bound to the GHS-HA indicators this app ships with; rebinding or "
+"clearing one overrides it."
+
+msgid "Assessment tool"
+msgstr "Assessment tool"
+
+msgid "Regional (94 indicators)"
+msgstr "Regional (94 indicators)"
+
+msgid "District (93 indicators)"
+msgstr "District (93 indicators)"
+
+msgid "Filter indicators"
+msgstr "Filter indicators"
+
+msgid "Search by name or code"
+msgstr "Search by name or code"
+
+msgid "All objectives"
+msgstr "All objectives"
+
+msgid "Mapping status"
+msgstr "Mapping status"
+
+msgid "All"
+msgstr "All"
+
+msgid "Mapped"
+msgstr "Mapped"
+
+msgid "Unmapped"
+msgstr "Unmapped"
+
+msgid "Mapped to"
+msgstr "Mapped to"
+
+msgid "Built in"
+msgstr "Built in"
+
+msgid "Custom"
+msgstr "Custom"
+
+msgid "Manual entry"
+msgstr "Manual entry"
+
+msgid "Cancel"
+msgstr "Cancel"
+
+msgid "Map"
+msgstr "Map"
+
+msgid "Clear"
+msgstr "Clear"
+
+msgid "Search DHIS2 metadata"
+msgstr "Search DHIS2 metadata"
+
+msgid "Type at least 2 characters"
+msgstr "Type at least 2 characters"
+
+msgid "Searching…"
+msgstr "Searching…"
+
+msgid "Could not load assessments"
+msgstr "Could not load assessments"
+
+msgid "{{year}} assessments"
+msgstr "{{year}} assessments"
+
+msgid "Nothing saved yet"
+msgstr "Nothing saved yet"
+
+msgid ""
+"No assessment has been saved for {{year}}. Counts appear here as regions "
+"and districts begin."
+msgstr ""
+"No assessment has been saved for {{year}}. Counts appear here as regions "
+"and districts begin."
+
+msgid "DHIS2 coverage"
+msgstr "DHIS2 coverage"
+
+msgid ""
+"How many rows of each tool are bound to a DHIS2 indicator. Unbound rows "
+"stay manual entry."
+msgstr ""
+"How many rows of each tool are bound to a DHIS2 indicator. Unbound rows "
+"stay manual entry."
+
+msgid "Tool"
+msgstr "Tool"
+
+msgid "Bound"
+msgstr "Bound"
+
+msgid "Coverage"
+msgstr "Coverage"
+
+msgid "An org unit cannot review itself."
+msgstr "An org unit cannot review itself."
+
+msgid "{{reviewer}} will review {{assessed}}"
+msgstr "{{reviewer}} will review {{assessed}}"
+
+msgid "Pairing removed"
+msgstr "Pairing removed"
+
+msgid "Peer review pairings for {{year}}"
+msgstr "Peer review pairings for {{year}}"
+
+msgid ""
+"Each pairing says that one org unit reviews another. Pairings are held per "
+"year, so last cycle is left intact when this one is redrawn."
+msgstr ""
+"Each pairing says that one org unit reviews another. Pairings are held per "
+"year, so last cycle is left intact when this one is redrawn."
+
+msgid "Level"
+msgstr "Level"
+
+msgid "Reviews"
+msgstr "Reviews"
+
+msgid "Add pairing"
+msgstr "Add pairing"
+
+msgid "No pairings yet"
+msgstr "No pairings yet"
+
+msgid "Nothing is paired for {{year}}. Add a pairing above."
+msgstr "Nothing is paired for {{year}}. Add a pairing above."
+
+msgid "Remove"
+msgstr "Remove"
+
+msgid "Period created for {{year}}"
+msgstr "Period created for {{year}}"
+
+msgid "{{year}} is now {{status}}"
+msgstr "{{year}} is now {{status}}"
+
+msgid "Year"
+msgstr "Year"
+
+msgid "Create period"
+msgstr "Create period"
+
+msgid "No periods recorded"
+msgstr "No periods recorded"
+
+msgid ""
+"Every year is open until a period is created for it. Create one for the "
+"year you want to control; the others are unaffected."
+msgstr ""
+"Every year is open until a period is created for it. Create one for the "
+"year you want to control; the others are unaffected."
+
+msgid "What it means"
+msgstr "What it means"
+
+msgid "Last changed"
+msgstr "Last changed"
+
+msgid "Change to"
+msgstr "Change to"
+
+msgid "Read-only outside national"
+msgstr "Read-only outside national"
+
+msgid ""
+"A period decides when the whole country submits, so it is opened and closed "
+"nationally. It is shown here because it governs whether your own "
+"assessments can be submitted."
+msgstr ""
+"A period decides when the whole country submits, so it is opened and closed "
+"nationally. It is shown here because it governs whether your own "
+"assessments can be submitted."
+
+msgid "A closed year is not a locked one"
+msgstr "A closed year is not a locked one"
+
+msgid ""
+"Closing a year stops new submissions but leaves data entry alone, so work "
+"in progress is not lost the moment a deadline passes. Locking stops editing "
+"too. Neither ever blocks a reviewer from finishing a review already under "
+"way — a review that could not be completed would strand the assessment it "
+"belongs to."
+msgstr ""
+"Closing a year stops new submissions but leaves data entry alone, so work "
+"in progress is not lost the moment a deadline passes. Locking stops editing "
+"too. Neither ever blocks a reviewer from finishing a review already under "
+"way — a review that could not be completed would strand the assessment it "
+"belongs to."
+
+msgid "{{count}} regions"
+msgid_plural "{{count}} regions"
+msgstr[0] "{{count}} regions"
+msgstr[1] "{{count}} regions"
+
+msgid "{{count}} districts"
+msgid_plural "{{count}} districts"
+msgstr[0] "{{count}} districts"
+msgstr[1] "{{count}} districts"
+
+msgid "Districts assessed"
+msgstr "Districts assessed"
+
+msgid "Stored"
+msgstr "Stored"
+
+msgid "{{count}} districts have no parent region"
+msgid_plural "{{count}} districts have no parent region"
+msgstr[0] "{{count}} districts have no parent region"
+msgstr[1] "{{count}} districts have no parent region"
+
+msgid ""
+"A district DHIS2 reports without a parent cannot be rolled up into a "
+"region, so it will be missing from the regional dashboard. Correct the "
+"hierarchy in the Maintenance app."
+msgstr ""
+"A district DHIS2 reports without a parent cannot be rolled up into a "
+"region, so it will be missing from the regional dashboard. Correct the "
+"hierarchy in the Maintenance app."
+
+msgid "Read from DHIS2, not stored here"
+msgstr "Read from DHIS2, not stored here"
+
+msgid ""
+"Regions and districts are DHIS2 metadata. The app reads them fresh every "
+"time rather than keeping its own copy, so changes made in the Maintenance "
+"app appear here immediately — and there is no second list to fall out of "
+"step."
+msgstr ""
+"Regions and districts are DHIS2 metadata. The app reads them fresh every "
+"time rather than keeping its own copy, so changes made in the Maintenance "
+"app appear here immediately — and there is no second list to fall out of "
+"step."
+
+msgid "Settings saved"
+msgstr "Settings saved"
+
+msgid "Default assessment year"
+msgstr "Default assessment year"
+
+msgid "Organisation name"
+msgstr "Organisation name"
+
+msgid "Save settings"
+msgstr "Save settings"
+
+msgid "The framework is not a setting"
+msgstr "The framework is not a setting"
+
+msgid ""
+"Which tool an assessment uses is decided by the level being assessed - "
+"regional or district - not by a setting, because the two are different "
+"instruments and a record must keep the one it was scored against."
+msgstr ""
+"Which tool an assessment uses is decided by the level being assessed - "
+"regional or district - not by a setting, because the two are different "
+"instruments and a record must keep the one it was scored against."
+
+msgid "Regional tool"
+msgstr "Regional tool"
+
+msgid "District tool"
+msgstr "District tool"
+
+msgid "Targets saved for {{year}}"
+msgstr "Targets saved for {{year}}"
+
+msgid "No targets are stored for {{year}}"
+msgstr "No targets are stored for {{year}}"
+
+msgid "Copied {{count}} targets from {{year}}. Save to keep them."
+msgid_plural "Copied {{count}} targets from {{year}}. Save to keep them."
+msgstr[0] "Copied {{count}} targets from {{year}}. Save to keep them."
+msgstr[1] "Copied {{count}} targets from {{year}}. Save to keep them."
+
+msgid "Code"
+msgstr "Code"
+
+msgid "Direction"
+msgstr "Direction"
+
+msgid "Default target"
+msgstr "Default target"
+
+msgid "Default lower"
+msgstr "Default lower"
+
+msgid "Default upper"
+msgstr "Default upper"
+
+msgid "Lower"
+msgstr "Lower"
+
+msgid "Upper"
+msgstr "Upper"
+
+msgid "That file has no rows"
+msgstr "That file has no rows"
+
+msgid "That file has no Code column"
+msgstr "That file has no Code column"
+
+msgid "{{matched}} rows read, {{skipped}} ignored. Review and save."
+msgstr "{{matched}} rows read, {{skipped}} ignored. Review and save."
+
+msgid "{{count}} of {{total}} rows overridden"
+msgid_plural "{{count}} of {{total}} rows overridden"
+msgstr[0] "{{count}} of {{total}} rows overridden"
+msgstr[1] "{{count}} of {{total}} rows overridden"
+
+msgid "Save targets"
+msgstr "Save targets"
+
+msgid "Copy from {{year}}"
+msgstr "Copy from {{year}}"
+
+msgid "Reset to defaults"
+msgstr "Reset to defaults"
+
+msgid "Import CSV"
+msgstr "Import CSV"
+
+msgid "Read-only at district level"
+msgstr "Read-only at district level"
+
+msgid ""
+"These targets apply to every district on the tool, so they are set "
+"nationally or regionally. Rows whose target is genuinely set locally are "
+"marked \"varies\" below and are edited on the assessment itself."
+msgstr ""
+"These targets apply to every district on the tool, so they are set "
+"nationally or regionally. Rows whose target is genuinely set locally are "
+"marked \"varies\" below and are edited on the assessment itself."
+
+msgid "Default"
+msgstr "Default"
+
+msgid "Overridden"
+msgstr "Overridden"
+
+msgid "varies"
+msgstr "varies"
+
+msgid "Set"
+msgstr "Set"
+
+msgid "Could not load users"
+msgstr "Could not load users"
+
+msgid "{{count}} users can use this app"
+msgid_plural "{{count}} users can use this app"
+msgstr[0] "{{count}} users can use this app"
+msgstr[1] "{{count}} users can use this app"
+
+msgid "Nobody holds the app authorities"
+msgstr "Nobody holds the app authorities"
+
+msgid "User"
+msgstr "User"
+
+msgid "Username"
+msgstr "Username"
+
+msgid "Can enter data"
+msgstr "Can enter data"
+
+msgid "Can review"
+msgstr "Can review"
+
+msgid "Can administer"
+msgstr "Can administer"
+
+msgid "Through role"
+msgstr "Through role"
+
+msgid "Superuser"
+msgstr "Superuser"
+
+msgid "Granted in DHIS2, shown here"
+msgstr "Granted in DHIS2, shown here"
+
+msgid ""
+"Authorities are granted to user roles in the DHIS2 Users app, not here. A "
+"user with no org unit at all gets the narrowest view rather than the "
+"widest, so an account that reaches the app but sees nothing is usually one "
+"with no organisation unit assigned."
+msgstr ""
+"Authorities are granted to user roles in the DHIS2 Users app, not here. A "
+"user with no org unit at all gets the narrowest view rather than the "
+"widest, so an account that reaches the app but sees nothing is usually one "
+"with no organisation unit assigned."
 
 msgid "Rank"
 msgstr "Rank"
@@ -2409,17 +2415,6 @@ msgstr "Generated {{date}}"
 msgid "Page {{page}} of {{pages}}"
 msgstr "Page {{page}} of {{pages}}"
 
-msgctxt ""
-"ADMIN. Grant them to the relevant roles in the Users app; the app install "
-"creates all three authorities."
-msgid ""
-"No user role on this instance carries GHS_ASSESSMENT_EDIT, GHS_PEER_REVIEW "
-"or GHS_ASSESSMENT"
-msgstr ""
-"No user role on this instance carries GHS_ASSESSMENT_EDIT, GHS_PEER_REVIEW "
-"or GHS_ASSESSMENT_ADMIN. Grant them to the relevant roles in the Users app; "
-"the app install creates all three authorities."
-
 msgctxt "ADMIN authority to configure the assessment."
 msgid "You need the GHS_ASSESSMENT"
 msgstr "You need the GHS_ASSESSMENT_ADMIN authority to configure the assessment."
@@ -2448,6 +2443,17 @@ msgid "Either you lack the GHS_ASSESSMENT"
 msgstr ""
 "Either you lack the GHS_ASSESSMENT_EDIT authority, or the assessment has "
 "been submitted and is locked pending peer review."
+
+msgctxt ""
+"ADMIN. Grant them to the relevant roles in the Users app; the app install "
+"creates all three authorities."
+msgid ""
+"No user role on this instance carries GHS_ASSESSMENT_EDIT, GHS_PEER_REVIEW "
+"or GHS_ASSESSMENT"
+msgstr ""
+"No user role on this instance carries GHS_ASSESSMENT_EDIT, GHS_PEER_REVIEW "
+"or GHS_ASSESSMENT_ADMIN. Grant them to the relevant roles in the Users app; "
+"the app install creates all three authorities."
 
 msgctxt "Application title"
 msgid "__MANIFEST_APP_TITLE"

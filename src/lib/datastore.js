@@ -18,6 +18,17 @@ import {
 export const assessmentKey = (year, orgUnitId) =>
     `assessment-${year}-${orgUnitId}`
 
+/**
+ * The key a record belongs under, read from the record itself rather than from
+ * whatever the page currently has selected. A save that lands after the user
+ * has moved to another org unit then still goes to the record it came from,
+ * never over the one now on screen. Null when the record cannot say.
+ */
+export const recordKey = (record) =>
+    record?.year && record?.orgUnit?.id
+        ? assessmentKey(record.year, record.orgUnit.id)
+        : null
+
 const isNotFound = (error) => {
     const status = error?.details?.httpStatusCode ?? error?.httpStatusCode
     return (

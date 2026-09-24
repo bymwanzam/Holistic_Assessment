@@ -117,8 +117,8 @@ export const submitBlockers = (assessment, completion, period) => {
 export const canSubmit = (assessment, completion, period) =>
     submitBlockers(assessment, completion, period).length === 0
 
-export const submitForReview = (assessment, user, completion) => {
-    if (!canSubmit(assessment, completion)) {
+export const submitForReview = (assessment, user, completion, period) => {
+    if (!canSubmit(assessment, completion, period)) {
         throw new Error(i18n.t('Assessment is not ready to submit.'))
     }
     const resubmission = assessment.status === STATUS.REVISION
