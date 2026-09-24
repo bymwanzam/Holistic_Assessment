@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2026-09-24T18:37:31.898Z\n"
-"PO-Revision-Date: 2026-09-24T18:37:31.898Z\n"
+"POT-Creation-Date: 2026-09-24T22:22:09.733Z\n"
+"PO-Revision-Date: 2026-09-24T22:22:09.733Z\n"
 
 msgid "Dashboard"
 msgstr "Dashboard"
@@ -184,6 +184,26 @@ msgstr "Objective {{n}}"
 
 msgid "{{answered}}/{{total}} complete"
 msgstr "{{answered}}/{{total}} complete"
+
+msgid ""
+"the data source did not respond in time ({{status}}). It may be busy; try "
+"again in a few minutes."
+msgstr ""
+"the data source did not respond in time ({{status}}). It may be busy; try "
+"again in a few minutes."
+
+msgid ""
+"access was refused ({{status}}). Check the data source connection on the "
+"Admin page."
+msgstr ""
+"access was refused ({{status}}). Check the data source connection on the "
+"Admin page."
+
+msgid "the data source could not be reached."
+msgstr "the data source could not be reached."
+
+msgid "an unknown error occurred."
+msgstr "an unknown error occurred."
 
 msgid "Draft"
 msgstr "Draft"

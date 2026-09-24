@@ -119,12 +119,13 @@ export const AssessmentPage = ({ level }) => {
 
     const handleFetch = async () => {
         try {
-            const { values, matched, requested } = await fetchValues({
-                mapping,
-                orgUnitId: orgUnit.id,
-                level,
-                year,
-            })
+            const { values, matched, requested, failed, failedCodes, failure } =
+                await fetchValues({
+                    mapping,
+                    orgUnitId: orgUnit.id,
+                    level,
+                    year,
+                })
             if (requested === 0) {
                 notify(
                     i18n.t(
@@ -136,6 +137,23 @@ export const AssessmentPage = ({ level }) => {
             }
             mergeValues(values)
             const from = sourceLabel(dataSource)
+            if (failed) {
+                notify(
+                    i18n.t(
+                        'Fetched {{matched}} of {{requested}} mapped indicators. {{failed}} could not be read ({{codes}}): {{failure}}',
+                        {
+                            matched,
+                            requested,
+                            failed,
+                            codes: failedCodes.join(', '),
+                            failure,
+                            interpolation: { escapeValue: false },
+                        }
+                    ),
+                    'warning'
+                )
+                return
+            }
             notify(
                 from
                     ? i18n.t(

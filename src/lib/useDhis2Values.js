@@ -2,6 +2,14 @@ import { useDataEngine } from '@dhis2/app-runtime'
 import i18n from '@dhis2/d2-i18n'
 import { useCallback, useRef, useState } from 'react'
 import orgUnitAliases from '../framework/org-unit-aliases.json'
+import {
+    BATCH_SIZE,
+    CONCURRENCY,
+    chunk,
+    describeFetchError,
+    mapSettled,
+    withRetry,
+} from './analyticsFetch.js'
 import { LEVEL, ORG_UNIT_LEVEL } from './constants.js'
 import { isRemote, sourceResource } from './dataSource.js'
 import { useSettings } from './datastore.js'
@@ -61,10 +69,12 @@ export const useDhis2Values = () => {
             if (!unitCache.current.has(cacheKey)) {
                 const [local, source] = await Promise.all([
                     engine.query(orgUnitsQuery('organisationUnits', dhisLevel)),
-                    engine.query(
-                        orgUnitsQuery(
-                            sourceResource(dataSource, 'organisationUnits'),
-                            dhisLevel
+                    withRetry(() =>
+                        engine.query(
+                            orgUnitsQuery(
+                                sourceResource(dataSource, 'organisationUnits'),
+                                dhisLevel
+                            )
                         )
                     ),
                 ])
@@ -112,30 +122,38 @@ export const useDhis2Values = () => {
                 const dx = [...new Set(entries.map(([, m]) => m.id))]
                 const periods = [String(year), String(year - 1)]
 
-                const res = await engine.query({
-                    analytics: {
-                        resource: sourceResource(dataSource, 'analytics'),
-                        params: {
-                            dimension: [
-                                `dx:${dx.join(';')}`,
-                                `pe:${periods.join(';')}`,
-                            ],
-                            filter: `ou:${sourceOrgUnitId}`,
-                            skipMeta: true,
-                            outputIdScheme: 'UID',
-                        },
-                    },
-                })
-
-                const headers = res.analytics?.headers || []
-                const rows = res.analytics?.rows || []
-                const dxIdx = headers.findIndex((h) => h.name === 'dx')
-                const peIdx = headers.findIndex((h) => h.name === 'pe')
-                const valIdx = headers.findIndex((h) => h.name === 'value')
+                const query = (ids) =>
+                    withRetry(() =>
+                        engine.query({
+                            analytics: {
+                                resource: sourceResource(
+                                    dataSource,
+                                    'analytics'
+                                ),
+                                params: {
+                                    dimension: [
+                                        `dx:${ids.join(';')}`,
+                                        `pe:${periods.join(';')}`,
+                                    ],
+                                    filter: `ou:${sourceOrgUnitId}`,
+                                    skipMeta: true,
+                                    outputIdScheme: 'UID',
+                                },
+                            },
+                        })
+                    )
 
                 // dx id -> { '2025': n, '2024': n }
                 const byDx = new Map()
-                if (dxIdx >= 0 && peIdx >= 0 && valIdx >= 0) {
+                const collect = (analytics) => {
+                    const headers = analytics?.headers || []
+                    const rows = analytics?.rows || []
+                    const dxIdx = headers.findIndex((h) => h.name === 'dx')
+                    const peIdx = headers.findIndex((h) => h.name === 'pe')
+                    const valIdx = headers.findIndex((h) => h.name === 'value')
+                    if (dxIdx < 0 || peIdx < 0 || valIdx < 0) {
+                        return
+                    }
                     rows.forEach((row) => {
                         const id = row[dxIdx]
                         const pe = row[peIdx]
@@ -148,6 +166,48 @@ export const useDhis2Values = () => {
                         }
                         byDx.get(id)[pe] = value
                     })
+                }
+
+                // Small batches, retried: one request for everything
+                // outlives the gateway and comes back 504.
+                const batches = chunk(dx, BATCH_SIZE)
+                const settled = await mapSettled(batches, CONCURRENCY, query)
+                const retryIds = []
+                let firstError = null
+                settled.forEach((outcome, i) => {
+                    if (outcome.status === 'fulfilled') {
+                        collect(outcome.value.analytics)
+                        return
+                    }
+                    firstError = firstError || outcome.reason
+                    retryIds.push(...batches[i])
+                })
+
+                // A batch that still times out is usually held up by one or
+                // two slow indicators; asked for alone, the rest get through.
+                const failedIds = new Set()
+                if (retryIds.length) {
+                    const singles = await mapSettled(
+                        retryIds,
+                        CONCURRENCY,
+                        (id) => query([id])
+                    )
+                    singles.forEach((outcome, i) => {
+                        if (outcome.status === 'fulfilled') {
+                            collect(outcome.value.analytics)
+                            return
+                        }
+                        firstError = outcome.reason
+                        failedIds.add(retryIds[i])
+                    })
+                }
+                if (!failedIds.size) {
+                    firstError = null
+                }
+
+                // Nothing came back at all: report it as the failure it is.
+                if (firstError && failedIds.size === dx.length) {
+                    throw firstError
                 }
 
                 const values = {}
@@ -171,12 +231,26 @@ export const useDhis2Values = () => {
                     }
                 })
 
-                const result = { values, matched, requested: entries.length }
+                const failedCodes = entries
+                    .filter(([, m]) => failedIds.has(m.id))
+                    .map(([code]) => code)
+                const result = {
+                    values,
+                    matched,
+                    requested: entries.length,
+                    failed: failedCodes.length,
+                    failedCodes,
+                    failure: firstError ? describeFetchError(firstError) : null,
+                }
                 setLastResult(result)
                 return result
             } catch (e) {
                 setError(e)
-                throw e
+                // The engine's own wording for a gateway timeout is "An unknown
+                // error occurred - (504)"; say what it means instead.
+                const friendly = new Error(describeFetchError(e))
+                friendly.cause = e
+                throw friendly
             } finally {
                 setLoading(false)
             }
