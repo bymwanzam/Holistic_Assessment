@@ -230,9 +230,23 @@ export const DashboardPage = () => {
     const completed = (rows) =>
         rows.filter((s) => SUBMITTED_ONWARDS.has(s.record.status)).length
 
-    // Districts of the user's own region, which is what its own counts mean.
+    /*
+     * Districts of the user's own region, which is what its own counts mean.
+     * The region comes from the user's DHIS2 assignment, not from an
+     * assessment, so its districts show before the region has saved its own.
+     */
+    const homeRegionId = useMemo(() => {
+        if (mine?.record.level === LEVEL.REGION) {
+            return mine.record.orgUnit?.id
+        }
+        return (
+            user.orgUnits.find((o) => o.level === ORG_LEVEL.REGIONAL)?.id ||
+            null
+        )
+    }, [mine, user.orgUnits])
+
     const myDistricts = useMemo(() => {
-        const parentId = mine?.record.orgUnit?.id
+        const parentId = homeRegionId
         if (!parentId) {
             return []
         }
@@ -243,7 +257,7 @@ export const DashboardPage = () => {
                     s.record.orgUnit?.parentId === parentId
             )
             .sort(byName)
-    }, [scored, mine])
+    }, [scored, homeRegionId])
 
     const rank = useMemo(() => {
         if (!mine || mine.record.level !== LEVEL.REGION) {
@@ -596,23 +610,24 @@ export const DashboardPage = () => {
                                     ))}
                                 </div>
                             </section>
-
-                            {/*
-                        Only a region has districts under it, so a district user
-                        sees the two panels above and stops there.
-                    */}
-                            {myDistricts.length > 0 && (
-                                <section className={styles.panel}>
-                                    <h2 className={styles.panelTitle}>
-                                        {i18n.t('District Assessment Status')}
-                                    </h2>
-                                    <StatusTable
-                                        rows={myDistricts}
-                                        unitLabel={i18n.t('District')}
-                                    />
-                                </section>
-                            )}
                         </>
+                    )}
+
+                    {/*
+                        Only a region has districts under it, so a district user
+                        sees the panels above and stops there. Shown whether or
+                        not the region has saved its own assessment yet.
+                    */}
+                    {myDistricts.length > 0 && (
+                        <section className={styles.panel}>
+                            <h2 className={styles.panelTitle}>
+                                {i18n.t('District Assessment Status')}
+                            </h2>
+                            <StatusTable
+                                rows={myDistricts}
+                                unitLabel={i18n.t('District')}
+                            />
+                        </section>
                     )}
                 </>
             )}

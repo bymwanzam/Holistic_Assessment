@@ -113,6 +113,49 @@
     }
 }
 
+/*
+ * The user's own org unit, under the navigation: a quiet label over a tinted
+ * brand-green chip, so it reads as context rather than as another link.
+ */
+.orgUnit {
+    margin: var(--spacers-dp16) var(--spacers-dp16) 0;
+    padding-block-start: var(--spacers-dp16);
+    border-block-start: 1px solid var(--colors-grey200);
+}
+
+.orgUnitLabel {
+    display: block;
+    margin-block-end: var(--spacers-dp8);
+    font-size: 12px;
+    color: var(--colors-grey600);
+}
+
+.orgUnitList {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacers-dp4);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.orgUnitName {
+    padding: var(--spacers-dp8) var(--spacers-dp12);
+    border-radius: 8px;
+    background: var(--ghs-brand-tint);
+    color: var(--ghs-brand-ink);
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    overflow-wrap: anywhere;
+}
+
+@media (forced-colors: active) {
+    .orgUnitName {
+        border: 1px solid CanvasText;
+    }
+}
+
 .main {
     flex: 1 1 auto;
     min-inline-size: 0;

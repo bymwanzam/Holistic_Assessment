@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2026-09-24T22:22:09.733Z\n"
-"PO-Revision-Date: 2026-09-24T22:22:09.733Z\n"
+"POT-Creation-Date: 2026-09-25T10:35:48.146Z\n"
+"PO-Revision-Date: 2026-09-25T10:35:48.146Z\n"
 
 msgid "Dashboard"
 msgstr "Dashboard"
@@ -32,6 +32,15 @@ msgstr "Administration"
 msgid "Help"
 msgstr "Help"
 
+msgid "National (all organisation units)"
+msgstr "National (all organisation units)"
+
+msgid "Your Organisation Units"
+msgstr "Your Organisation Units"
+
+msgid "Your Organisation Unit"
+msgstr "Your Organisation Unit"
+
 msgid "Main navigation"
 msgstr "Main navigation"
 
@@ -46,6 +55,28 @@ msgstr "© {{year}} Bigvalues IT Systems"
 
 msgid "Version {{version}} (Build {{build}})"
 msgstr "Version {{version}} (Build {{build}})"
+
+msgid "No organisation unit assigned"
+msgstr "No organisation unit assigned"
+
+msgid ""
+"No organisation unit assigned to your account. Please contact your "
+"administrator."
+msgstr ""
+"No organisation unit assigned to your account. Please contact your "
+"administrator."
+
+msgid "No access at your organisation unit level"
+msgstr "No access at your organisation unit level"
+
+msgid ""
+"The Holistic Assessment is available to users assigned at national, "
+"regional or district level. Ask your DHIS2 administrator to assign you to "
+"one of these levels."
+msgstr ""
+"The Holistic Assessment is available to users assigned at national, "
+"regional or district level. Ask your DHIS2 administrator to assign you to "
+"one of these levels."
 
 msgid "Assessment year"
 msgstr "Assessment year"
@@ -653,6 +684,13 @@ msgstr "Coverage"
 msgid "An org unit cannot review itself."
 msgstr "An org unit cannot review itself."
 
+msgid ""
+"{{reviewer}} was paired at national level. Ask a national administrator to "
+"change it."
+msgstr ""
+"{{reviewer}} was paired at national level. Ask a national administrator to "
+"change it."
+
 msgid "{{reviewer}} will review {{assessed}}"
 msgstr "{{reviewer}} will review {{assessed}}"
 
@@ -678,6 +716,13 @@ msgstr "Reviews"
 msgid "Add pairing"
 msgstr "Add pairing"
 
+msgid ""
+"Regional pairings are drawn at national level. Your region and the region "
+"paired with it are listed below."
+msgstr ""
+"Regional pairings are drawn at national level. Your region and the region "
+"paired with it are listed below."
+
 msgid "No pairings yet"
 msgstr "No pairings yet"
 
@@ -686,6 +731,9 @@ msgstr "Nothing is paired for {{year}}. Add a pairing above."
 
 msgid "Remove"
 msgstr "Remove"
+
+msgid "Set nationally"
+msgstr "Set nationally"
 
 msgid "Period created for {{year}}"
 msgstr "Period created for {{year}}"
@@ -1068,6 +1116,18 @@ msgstr "Submit for review"
 
 msgid "Read-only access"
 msgstr "Read-only access"
+
+msgid "Not your paired unit"
+msgstr "Not your paired unit"
+
+msgid ""
+"{{unit}}'s assessment is filled in by the unit paired with it, so you can "
+"view it but not change it. You can fetch data for and edit only the unit "
+"yours is paired with."
+msgstr ""
+"{{unit}}'s assessment is filled in by the unit paired with it, so you can "
+"view it but not change it. You can fetch data for and edit only the unit "
+"yours is paired with."
 
 msgid "Select an organisation unit"
 msgstr "Select an organisation unit"
@@ -2254,11 +2314,11 @@ msgid "Reports & Analytics"
 msgstr "Reports & Analytics"
 
 msgid ""
-"Seven reports over the assessments stored for a year. Every figure is read "
-"from the datastore, not from analytics."
+"Reports over the assessments stored for a year. Every figure is read from "
+"the datastore, not from analytics."
 msgstr ""
-"Seven reports over the assessments stored for a year. Every figure is read "
-"from the datastore, not from analytics."
+"Reports over the assessments stored for a year. Every figure is read from "
+"the datastore, not from analytics."
 
 msgid "All regions"
 msgstr "All regions"

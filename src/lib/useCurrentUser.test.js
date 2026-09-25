@@ -5,7 +5,13 @@ import {
     AUTH_PEER_REVIEW,
     AUTH_SUPERUSER,
 } from './constants.js'
-import { ORG_LEVEL, permissionsOf, scopeOf } from './useCurrentUser.js'
+import {
+    ORG_LEVEL,
+    hasRoleOf,
+    permissionsOf,
+    roleOrgUnitsOf,
+    scopeOf,
+} from './useCurrentUser.js'
 
 describe('permissions', () => {
     it('grants nothing to an account holding no app authority', () => {
@@ -73,11 +79,20 @@ describe('scope', () => {
         expect(scopeOf(at(3, 2))).toBe(ORG_LEVEL.REGIONAL)
     })
 
-    it('treats a superuser as national whatever they are assigned', () => {
+    it('places a superuser by their org unit like anyone else', () => {
         expect(scopeOf({ isSuperuser: true, orgUnits: [{ level: 3 }] })).toBe(
+            ORG_LEVEL.DISTRICT
+        )
+        expect(scopeOf({ isSuperuser: true, orgUnits: [{ level: 2 }] })).toBe(
+            ORG_LEVEL.REGIONAL
+        )
+    })
+
+    it('treats a superuser with no org unit at levels 1 to 3 as national', () => {
+        expect(scopeOf({ isSuperuser: true, orgUnits: [] })).toBe(
             ORG_LEVEL.NATIONAL
         )
-        expect(scopeOf({ isSuperuser: true, orgUnits: [] })).toBe(
+        expect(scopeOf({ isSuperuser: true, orgUnits: [{ level: 5 }] })).toBe(
             ORG_LEVEL.NATIONAL
         )
     })
@@ -98,5 +113,48 @@ describe('scope', () => {
                 orgUnits: [{ level: null }, { level: 2 }],
             })
         ).toBe(ORG_LEVEL.REGIONAL)
+    })
+})
+
+/*
+ * Only national, regional and district assignments confer a role: the
+ * assessment is not run below district, and a sub-district or facility user is
+ * refused rather than lifted to the district above them.
+ */
+describe('role levels', () => {
+    const at = (...levels) => ({
+        isSuperuser: false,
+        orgUnits: levels.map((level) => ({ level })),
+    })
+
+    it('keeps only org units at levels 1 to 3', () => {
+        expect(
+            roleOrgUnitsOf([1, 2, 3, 4, 5].map((level) => ({ level }))).map(
+                (o) => o.level
+            )
+        ).toEqual([1, 2, 3])
+        expect(roleOrgUnitsOf()).toEqual([])
+    })
+
+    it('gives no role to a user assigned only below district', () => {
+        expect(scopeOf(at(4))).toBe(Infinity)
+        expect(scopeOf(at(5, 4))).toBe(Infinity)
+        expect(hasRoleOf(at(4))).toBe(false)
+        expect(hasRoleOf(at())).toBe(false)
+    })
+
+    it('ignores a below-district assignment held alongside a valid one', () => {
+        expect(scopeOf(at(4, 3))).toBe(ORG_LEVEL.DISTRICT)
+        expect(hasRoleOf(at(5, 2))).toBe(true)
+    })
+
+    it('grants a role at every level from national to district', () => {
+        ;[1, 2, 3].forEach((level) => expect(hasRoleOf(at(level))).toBe(true))
+    })
+
+    it('grants a superuser a role whatever they are assigned', () => {
+        expect(hasRoleOf({ isSuperuser: true, orgUnits: [{ level: 5 }] })).toBe(
+            true
+        )
     })
 })

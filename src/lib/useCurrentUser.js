@@ -48,6 +48,28 @@ export const permissionsOf = (authorities = []) => {
 }
 
 /**
+ * DHIS2 org unit levels: 1 national, 2 regional, 3 district.
+ */
+export const ORG_LEVEL = {
+    NATIONAL: 1,
+    REGIONAL: 2,
+    DISTRICT: 3,
+}
+
+/**
+ * The org units that confer a role in this app: those at levels 1 to 3.
+ *
+ * The assessment is run nationally, by region and by district, so those are the
+ * only levels a user's role is inherited from. An assignment below district —
+ * a sub-district or a facility — carries no role here, and a user holding only
+ * such assignments is not given the district's view in its place.
+ */
+export const roleOrgUnitsOf = (orgUnits = []) =>
+    orgUnits.filter(
+        (o) => o.level >= ORG_LEVEL.NATIONAL && o.level <= ORG_LEVEL.DISTRICT
+    )
+
+/**
  * The signed-in user, their authorities and their assigned org units.
  *
  * `canEdit` gates data entry, `canReview` conducting a peer review and
@@ -60,6 +82,8 @@ export const useCurrentUser = () => {
     return useMemo(() => {
         const me = data?.me
         const authorities = me?.authorities || []
+        const permissions = permissionsOf(authorities)
+        const orgUnits = roleOrgUnitsOf(me?.organisationUnits)
 
         return {
             loading,
@@ -67,38 +91,38 @@ export const useCurrentUser = () => {
             refetch,
             user: me || null,
             authorities,
-            ...permissionsOf(authorities),
-            orgUnits: me?.organisationUnits || [],
-            orgUnitIds: (me?.organisationUnits || []).map((o) => o.id),
+            ...permissions,
+            orgUnits,
+            orgUnitIds: orgUnits.map((o) => o.id),
+            hasRole: hasRoleOf({ ...permissions, orgUnits }),
         }
     }, [data, loading, error, refetch])
 }
 
 /**
- * DHIS2 org unit levels: 1 national, 2 regional, 3 district.
- */
-export const ORG_LEVEL = {
-    NATIONAL: 1,
-    REGIONAL: 2,
-    DISTRICT: 3,
-}
-
-/**
- * How far a user's remit reaches, as an org unit level: the widest org unit
- * they hold. A superuser is treated as national, and a user with no org unit at
- * all gets the narrowest view rather than the widest.
+ * How far a user's remit reaches, as an org unit level: the widest national,
+ * regional or district org unit they hold. A superuser is placed by their org
+ * unit like anyone else — ALL grants every authority, not a wider remit — and
+ * is treated as national only when they hold no such org unit. Anyone else
+ * without one gets the narrowest view rather than the widest.
  *
  * This is what decides which dashboard a user lands on and which Admin tabs
  * they see — a national user sees the country and its regions, a regional user
  * their region and its districts, a district user their district.
  */
 export const scopeOf = (user) => {
-    if (user.isSuperuser) {
-        return ORG_LEVEL.NATIONAL
+    const levels = roleOrgUnitsOf(user.orgUnits).map((o) => o.level)
+    if (levels.length) {
+        return Math.min(...levels)
     }
-    const levels = (user.orgUnits || []).map((o) => o.level).filter(Boolean)
-    return levels.length ? Math.min(...levels) : Infinity
+    return user.isSuperuser ? ORG_LEVEL.NATIONAL : Infinity
 }
+
+/**
+ * Whether the user has any role in the app at all: a superuser, or someone
+ * assigned to at least one national, regional or district org unit.
+ */
+export const hasRoleOf = (user) => scopeOf(user) <= ORG_LEVEL.DISTRICT
 
 /**
  * True when the user is assigned to `orgUnitId` or any of its ancestors,

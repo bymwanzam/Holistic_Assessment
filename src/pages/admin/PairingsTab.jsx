@@ -11,10 +11,9 @@ import React, { useMemo, useState } from 'react'
 import { useAppState } from '../../lib/AppState.jsx'
 import { LEVEL } from '../../lib/constants.js'
 import { usePeerPairings } from '../../lib/datastore.js'
-import {
-    useDistrictsForRegion,
-    useOrgUnitsForLevel,
-} from '../../lib/useOrgUnits.js'
+import { pairingScope } from '../../lib/useAccessibleOrgUnits.js'
+import { useCurrentUser } from '../../lib/useCurrentUser.js'
+import { useOrgUnitsForLevel } from '../../lib/useOrgUnits.js'
 import styles from '../AdminPage.module.css'
 
 /**
@@ -24,28 +23,68 @@ import styles from '../AdminPage.module.css'
  *
  * A pairing is one-directional on purpose: reciprocal review is the common
  * arrangement but not the only one, so adding A→B does not add B→A.
+ *
+ * Below national level the tab is cut to the user's region (see
+ * `pairingScope`): they pair the districts of their region with each other,
+ * and of the regions see only their own and the one paired with it.
  */
 export const PairingsTab = () => {
     const { year, regionId, setRegionId } = useAppState()
+    const user = useCurrentUser()
     const { value: stored, save, loading } = usePeerPairings()
 
-    const [level, setLevel] = useState(LEVEL.REGION)
     const { orgUnits: regions } = useOrgUnitsForLevel(LEVEL.REGION)
-    const { districts } = useDistrictsForRegion(regionId)
+    const { orgUnits: allDistricts } = useOrgUnitsForLevel(LEVEL.DISTRICT)
+
+    const forYear = useMemo(
+        () => (stored || {})[String(year)] || {},
+        [stored, year]
+    )
+
+    const scoped = useMemo(
+        () => pairingScope({ user, regions, districts: allDistricts, forYear }),
+        [user, regions, allDistricts, forYear]
+    )
+    const national = scoped === null
+
+    // Below national, district pairing is the one they draw, so it opens first.
+    const [chosenLevel, setLevel] = useState(null)
+    const level = chosenLevel || (national ? LEVEL.REGION : LEVEL.DISTRICT)
 
     const [reviewer, setReviewer] = useState(null)
     const [assessed, setAssessed] = useState(null)
     const [alert, setAlert] = useState(null)
 
-    const pool = level === LEVEL.DISTRICT ? districts : regions
-    const byId = useMemo(
-        () => new Map(pool.map((o) => [o.id, o.displayName || o.name])),
-        [pool]
+    const nationalDistricts = useMemo(
+        () =>
+            regionId
+                ? allDistricts.filter((d) => d.parent?.id === regionId)
+                : [],
+        [allDistricts, regionId]
     )
 
-    const forYear = useMemo(
-        () => (stored || {})[String(year)] || {},
-        [stored, year]
+    const pool = national
+        ? level === LEVEL.DISTRICT
+            ? nationalDistricts
+            : regions
+        : level === LEVEL.DISTRICT
+          ? scoped.districts
+          : scoped.regions
+
+    // Regional pairings are drawn nationally; below that they are only listed.
+    const canAdd = national || level === LEVEL.DISTRICT
+
+    // Named from every org unit, so a pairing reaching outside the current
+    // pool still shows a name rather than an id.
+    const byId = useMemo(
+        () =>
+            new Map(
+                [...regions, ...allDistricts].map((o) => [
+                    o.id,
+                    o.displayName || o.name,
+                ])
+            ),
+        [regions, allDistricts]
     )
 
     const notify = (message, tone = 'success') =>
@@ -68,6 +107,19 @@ export const PairingsTab = () => {
             notify(i18n.t('An org unit cannot review itself.'), 'critical')
             return
         }
+        // A reviewer already paired outside the region was paired nationally;
+        // replacing that here would quietly undo a national decision.
+        const current = rows.find((r) => r.reviewerId === reviewer)
+        if (current && !current.editable) {
+            notify(
+                i18n.t(
+                    '{{reviewer}} was paired at national level. Ask a national administrator to change it.',
+                    { reviewer: byId.get(reviewer) }
+                ),
+                'critical'
+            )
+            return
+        }
         await persist({ ...forYear, [reviewer]: assessed })
         notify(
             i18n.t('{{reviewer}} will review {{assessed}}', {
@@ -86,7 +138,15 @@ export const PairingsTab = () => {
         notify(i18n.t('Pairing removed'))
     }
 
-    const rows = Object.entries(forYear)
+    const rows = national
+        ? Object.entries(forYear).map(([reviewerId, assessedId]) => ({
+              reviewerId,
+              assessedId,
+              editable: true,
+          }))
+        : level === LEVEL.DISTRICT
+          ? scoped.districtRows
+          : scoped.regionRows
 
     return (
         <section>
@@ -134,7 +194,7 @@ export const PairingsTab = () => {
                     </SingleSelectField>
                 </div>
 
-                {level === LEVEL.DISTRICT && (
+                {national && level === LEVEL.DISTRICT && (
                     <div className={styles.field}>
                         <SingleSelectField
                             dense
@@ -153,49 +213,65 @@ export const PairingsTab = () => {
                     </div>
                 )}
 
-                <div className={styles.field}>
-                    <SingleSelectField
-                        dense
-                        label={i18n.t('Reviewer')}
-                        selected={reviewer || ''}
-                        onChange={({ selected }) => setReviewer(selected)}
-                    >
-                        {pool.map((o) => (
-                            <SingleSelectOption
-                                key={o.id}
-                                label={o.displayName || o.name}
-                                value={o.id}
-                            />
-                        ))}
-                    </SingleSelectField>
-                </div>
+                {canAdd && (
+                    <>
+                        <div className={styles.field}>
+                            <SingleSelectField
+                                dense
+                                label={i18n.t('Reviewer')}
+                                selected={reviewer || ''}
+                                onChange={({ selected }) =>
+                                    setReviewer(selected)
+                                }
+                            >
+                                {pool.map((o) => (
+                                    <SingleSelectOption
+                                        key={o.id}
+                                        label={o.displayName || o.name}
+                                        value={o.id}
+                                    />
+                                ))}
+                            </SingleSelectField>
+                        </div>
 
-                <div className={styles.field}>
-                    <SingleSelectField
-                        dense
-                        label={i18n.t('Reviews')}
-                        selected={assessed || ''}
-                        onChange={({ selected }) => setAssessed(selected)}
-                    >
-                        {pool.map((o) => (
-                            <SingleSelectOption
-                                key={o.id}
-                                label={o.displayName || o.name}
-                                value={o.id}
-                            />
-                        ))}
-                    </SingleSelectField>
-                </div>
+                        <div className={styles.field}>
+                            <SingleSelectField
+                                dense
+                                label={i18n.t('Reviews')}
+                                selected={assessed || ''}
+                                onChange={({ selected }) =>
+                                    setAssessed(selected)
+                                }
+                            >
+                                {pool.map((o) => (
+                                    <SingleSelectOption
+                                        key={o.id}
+                                        label={o.displayName || o.name}
+                                        value={o.id}
+                                    />
+                                ))}
+                            </SingleSelectField>
+                        </div>
 
-                <Button
-                    small
-                    primary
-                    disabled={!reviewer || !assessed}
-                    onClick={add}
-                >
-                    {i18n.t('Add pairing')}
-                </Button>
+                        <Button
+                            small
+                            primary
+                            disabled={!reviewer || !assessed}
+                            onClick={add}
+                        >
+                            {i18n.t('Add pairing')}
+                        </Button>
+                    </>
+                )}
             </div>
+
+            {!canAdd && (
+                <p className={styles.sectionBody}>
+                    {i18n.t(
+                        'Regional pairings are drawn at national level. Your region and the region paired with it are listed below.'
+                    )}
+                </p>
+            )}
 
             {loading && (
                 <div className={styles.loading}>
@@ -222,7 +298,7 @@ export const PairingsTab = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {rows.map(([reviewerId, assessedId]) => (
+                        {rows.map(({ reviewerId, assessedId, editable }) => (
                             <tr key={reviewerId}>
                                 {/* An org unit outside the current level's pool
                                     still has to be listed, so its id is shown
@@ -230,13 +306,17 @@ export const PairingsTab = () => {
                                 <td>{byId.get(reviewerId) || reviewerId}</td>
                                 <td>{byId.get(assessedId) || assessedId}</td>
                                 <td>
-                                    <Button
-                                        small
-                                        destructive
-                                        onClick={() => remove(reviewerId)}
-                                    >
-                                        {i18n.t('Remove')}
-                                    </Button>
+                                    {editable ? (
+                                        <Button
+                                            small
+                                            destructive
+                                            onClick={() => remove(reviewerId)}
+                                        >
+                                            {i18n.t('Remove')}
+                                        </Button>
+                                    ) : (
+                                        i18n.t('Set nationally')
+                                    )}
                                 </td>
                             </tr>
                         ))}

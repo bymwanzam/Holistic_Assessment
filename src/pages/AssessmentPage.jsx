@@ -33,10 +33,7 @@ import { useAssessment } from '../lib/useAssessment.js'
 import { useUnsavedWarning } from '../lib/useAutoSave.js'
 import { useCurrentUser } from '../lib/useCurrentUser.js'
 import { useDhis2Values } from '../lib/useDhis2Values.js'
-import {
-    useDistrictsForRegion,
-    useOrgUnitsForLevel,
-} from '../lib/useOrgUnits.js'
+import { useAccessibleOrgUnits } from '../lib/useAccessibleOrgUnits.js'
 import {
     acceptRevisionRequest,
     applyScoreAdjustments,
@@ -61,14 +58,32 @@ export const AssessmentPage = ({ level }) => {
     const { value: periods, loading: periodsLoading } = usePeriods()
     const { fetchValues, loading: fetching, dataSource } = useDhis2Values()
 
-    const { orgUnits: regions } = useOrgUnitsForLevel(LEVEL.REGION)
-    const { districts } = useDistrictsForRegion(regionId)
+    const {
+        regions,
+        districts,
+        homeRegionId,
+        canModify,
+        loading: orgUnitsLoading,
+    } = useAccessibleOrgUnits({
+        level,
+        year,
+        regionId,
+    })
 
     const selectedId = level === LEVEL.DISTRICT ? districtId : regionId
     const orgUnit = useMemo(() => {
         const pool = level === LEVEL.DISTRICT ? districts : regions
         return pool.find((o) => o.id === selectedId) || null
     }, [level, districts, regions, selectedId])
+
+    /*
+     * Below national level an assessment is filled in by the unit paired with
+     * it, so a user may change this one only if it is their counterpart's.
+     * Every change on the page — fetching, typing, saving, submitting and
+     * answering the reviewer — goes through `mayEdit`.
+     */
+    const isCounterpart = !orgUnitsLoading && canModify(orgUnit?.id)
+    const mayEdit = user.canEdit && isCounterpart
 
     const [tab, setTab] = useState(0)
     const [alert, setAlert] = useState(null)
@@ -84,7 +99,7 @@ export const AssessmentPage = ({ level }) => {
         setMilestone,
         saveNow,
         autoSave,
-    } = useAssessment({ year, orgUnit, level, autoSave: user.canEdit })
+    } = useAssessment({ year, orgUnit, level, autoSave: mayEdit })
 
     useUnsavedWarning(autoSave.dirty)
 
@@ -99,7 +114,7 @@ export const AssessmentPage = ({ level }) => {
     // have loaded nothing is editable, rather than briefly open by default.
     const period = periodOf(periods, year)
     const editable = Boolean(
-        user.canEdit &&
+        mayEdit &&
         assessment &&
         !periodsLoading &&
         isOwnerEditable(assessment.status, period)
@@ -110,7 +125,7 @@ export const AssessmentPage = ({ level }) => {
         : []
     const canSubmitNow =
         Boolean(assessment) &&
-        user.canEdit &&
+        mayEdit &&
         !periodsLoading &&
         blockers.length === 0
 
@@ -298,6 +313,10 @@ export const AssessmentPage = ({ level }) => {
             <ContextBar
                 level={level}
                 year={year}
+                regions={regions}
+                homeRegionId={homeRegionId}
+                districts={districts}
+                loading={orgUnitsLoading}
                 regionId={regionId}
                 districtId={districtId}
                 onYearChange={setYear}
@@ -350,6 +369,20 @@ export const AssessmentPage = ({ level }) => {
                 </div>
             )}
 
+            {user.canEdit && orgUnit && !orgUnitsLoading && !isCounterpart && (
+                <div className={styles.notice}>
+                    <NoticeBox title={i18n.t('Not your paired unit')}>
+                        {i18n.t(
+                            "{{unit}}'s assessment is filled in by the unit paired with it, so you can view it but not change it. You can fetch data for and edit only the unit yours is paired with.",
+                            {
+                                unit: orgUnit.displayName,
+                                interpolation: { escapeValue: false },
+                            }
+                        )}
+                    </NoticeBox>
+                </div>
+            )}
+
             {!orgUnit && (
                 <NoticeBox title={i18n.t('Select an organisation unit')}>
                     {level === LEVEL.DISTRICT
@@ -391,7 +424,7 @@ export const AssessmentPage = ({ level }) => {
                                     <Button
                                         small
                                         primary
-                                        disabled={!user.canEdit}
+                                        disabled={!mayEdit}
                                         onClick={handleAcceptRevision}
                                     >
                                         {i18n.t('Accept revision request')}
@@ -416,7 +449,7 @@ export const AssessmentPage = ({ level }) => {
                                         <Button
                                             small
                                             primary
-                                            disabled={!user.canEdit}
+                                            disabled={!mayEdit}
                                             onClick={handleAcceptAdjustments}
                                         >
                                             {i18n.t(
@@ -428,7 +461,7 @@ export const AssessmentPage = ({ level }) => {
                                         </Button>
                                         <Button
                                             small
-                                            disabled={!user.canEdit}
+                                            disabled={!mayEdit}
                                             onClick={handleRejectAdjustments}
                                         >
                                             {i18n.t('Reject all')}
@@ -452,7 +485,7 @@ export const AssessmentPage = ({ level }) => {
                                 </p>
                                 <Button
                                     small
-                                    disabled={!user.canEdit}
+                                    disabled={!mayEdit}
                                     onClick={handleReopen}
                                 >
                                     {i18n.t('Reopen as draft')}

@@ -17,6 +17,8 @@ import {
     useIndicatorMapping,
 } from '../../lib/datastore.js'
 import { fmtPercent } from '../../lib/format.js'
+import { visibleRecords } from '../../lib/useAccessibleOrgUnits.js'
+import { useCurrentUser } from '../../lib/useCurrentUser.js'
 import styles from '../AdminPage.module.css'
 
 const ORDER = [
@@ -32,10 +34,11 @@ const ORDER = [
 export const OverviewTab = () => {
     const { year } = useAppState()
     const store = useDataStore()
+    const user = useCurrentUser()
     const { keys, loading: keysLoading } = useAssessmentKeys()
     const { value: allMapping } = useIndicatorMapping()
 
-    const [records, setRecords] = useState([])
+    const [loaded, setLoaded] = useState([])
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState(null)
 
@@ -46,16 +49,16 @@ export const OverviewTab = () => {
 
     const load = useCallback(async () => {
         if (!yearKeys.length) {
-            setRecords([])
+            setLoaded([])
             return
         }
         setLoading(true)
         setError(null)
         try {
-            const loaded = await Promise.all(
+            const read = await Promise.all(
                 yearKeys.map((k) => store.read(k.key))
             )
-            setRecords(loaded.filter(Boolean))
+            setLoaded(read.filter(Boolean))
         } catch (e) {
             setError(e)
         } finally {
@@ -66,6 +69,9 @@ export const OverviewTab = () => {
     useEffect(() => {
         load()
     }, [load])
+
+    // Below national level, only the user's own region and its districts.
+    const records = useMemo(() => visibleRecords(user, loaded), [user, loaded])
 
     const byStatus = useMemo(() => {
         const counts = Object.fromEntries(ORDER.map((s) => [s, 0]))

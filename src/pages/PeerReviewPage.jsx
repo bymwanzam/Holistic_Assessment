@@ -29,10 +29,7 @@ import { mappingForFramework, useIndicatorMapping } from '../lib/datastore.js'
 import { fmtPercent, fmtRelative } from '../lib/format.js'
 import { useAssessment } from '../lib/useAssessment.js'
 import { useCurrentUser } from '../lib/useCurrentUser.js'
-import {
-    useDistrictsForRegion,
-    useOrgUnitsForLevel,
-} from '../lib/useOrgUnits.js'
+import { useAccessibleOrgUnits } from '../lib/useAccessibleOrgUnits.js'
 import {
     canSubmitReview,
     recallReview,
@@ -74,8 +71,16 @@ export const PeerReviewPage = ({ level: fixedLevel }) => {
 
     const [chosenLevel, setLevel] = useState(LEVEL.REGION)
     const level = fixedLevel || chosenLevel
-    const { orgUnits: regions } = useOrgUnitsForLevel(LEVEL.REGION)
-    const { districts } = useDistrictsForRegion(regionId)
+    const {
+        regions,
+        districts,
+        homeRegionId,
+        loading: orgUnitsLoading,
+    } = useAccessibleOrgUnits({
+        level,
+        year,
+        regionId,
+    })
 
     const selectedId = level === LEVEL.DISTRICT ? districtId : regionId
     const orgUnit = useMemo(() => {
@@ -205,6 +210,10 @@ export const PeerReviewPage = ({ level: fixedLevel }) => {
             <ContextBar
                 level={level}
                 year={year}
+                regions={regions}
+                homeRegionId={homeRegionId}
+                districts={districts}
+                loading={orgUnitsLoading}
                 regionId={regionId}
                 districtId={districtId}
                 onYearChange={setYear}

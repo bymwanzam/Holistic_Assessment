@@ -10,6 +10,7 @@ import PropTypes from 'prop-types'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import {
     DEFAULT_FRAMEWORK_ID,
+    DISTRICT_FRAMEWORK_ID,
     allIndicators,
     getFramework,
 } from '../framework/index.js'
@@ -17,8 +18,10 @@ import { LEVEL } from '../lib/constants.js'
 import { useAssessmentKeys, useDataStore } from '../lib/datastore.js'
 import { assessmentYears } from '../lib/format.js'
 import { scoreAssessment } from '../lib/scoring.js'
+import { reportableRecords } from '../lib/useAccessibleOrgUnits.js'
+import { ORG_LEVEL, scopeOf, useCurrentUser } from '../lib/useCurrentUser.js'
 import { useScoringFramework } from '../lib/useScoringFramework.js'
-import { REPORTS, reportById } from '../reports/builders.js'
+import { reportsForScope } from '../reports/builders.js'
 import {
     exportCsv,
     exportPdf,
@@ -95,10 +98,18 @@ Section.propTypes = {
  */
 export const ReportsPage = () => {
     const store = useDataStore()
+    const user = useCurrentUser()
     const { keys, loading: keysLoading } = useAssessmentKeys()
 
+    /*
+     * Everything below is cut to the user's level: which reports are offered,
+     * which assessments they are built from, and which regions can be picked.
+     */
+    const scope = scopeOf(user)
+    const reports = useMemo(() => reportsForScope(scope), [scope])
+
     const [year, setYear] = useState(() => new Date().getFullYear() - 1)
-    const [reportId, setReportId] = useState(REPORTS[0].id)
+    const [reportId, setReportId] = useState(null)
     const [objectiveIndex, setObjectiveIndex] = useState(1)
     const [indicatorCode, setIndicatorCode] = useState('1.1')
     const [regionId, setRegionId] = useState('')
@@ -139,15 +150,18 @@ export const ReportsPage = () => {
 
     const scored = useMemo(
         () =>
-            records.map((record) => ({
-                record,
-                result: scoreAssessment(
-                    resolveFramework(record.frameworkId),
-                    record.values,
-                    record.milestones
-                ),
-            })),
-        [records, resolveFramework]
+            reportableRecords(
+                user,
+                records.map((record) => ({
+                    record,
+                    result: scoreAssessment(
+                        resolveFramework(record.frameworkId),
+                        record.values,
+                        record.milestones
+                    ),
+                }))
+            ),
+        [user, records, resolveFramework]
     )
 
     /* The regions that have an assessment, for the District Performance filter. */
@@ -167,12 +181,40 @@ export const ReportsPage = () => {
         [scored]
     )
 
+    // Below national the region is fixed: a regional or district user reports
+    // on their own region only, so there is no "All regions" to choose.
+    const regionFixed = scope > ORG_LEVEL.NATIONAL
+    useEffect(() => {
+        if (
+            regionFixed &&
+            regions.length &&
+            !regions.some(([id]) => id === regionId)
+        ) {
+            setRegionId(regions[0][0])
+        }
+    }, [regionFixed, regions, regionId])
+
+    // A district user reports only on district assessments, which use the
+    // district tool; its codes name different indicators from the regional one.
     const indicators = useMemo(
-        () => allIndicators(getFramework(DEFAULT_FRAMEWORK_ID)),
-        []
+        () =>
+            allIndicators(
+                getFramework(
+                    scope === ORG_LEVEL.DISTRICT
+                        ? DISTRICT_FRAMEWORK_ID
+                        : DEFAULT_FRAMEWORK_ID
+                )
+            ),
+        [scope]
     )
 
-    const definition = reportById(reportId)
+    const definition = reports.find((r) => r.id === reportId) || reports[0]
+    const scopeLabel =
+        scope <= ORG_LEVEL.NATIONAL
+            ? i18n.t('National scope: every region and district')
+            : scope === ORG_LEVEL.REGIONAL
+              ? i18n.t('Regional scope: your region and its districts')
+              : i18n.t('District scope: the districts of your region')
 
     const built = useMemo(
         () =>
@@ -197,7 +239,7 @@ export const ReportsPage = () => {
         }
     }
 
-    const busy = keysLoading || loading
+    const busy = keysLoading || loading || user.loading
 
     return (
         <div>
@@ -207,9 +249,12 @@ export const ReportsPage = () => {
                 </h1>
                 <p className={styles.subtitle}>
                     {i18n.t(
-                        'Seven reports over the assessments stored for a year. Every figure is read from the datastore, not from analytics.'
+                        'Reports over the assessments stored for a year. Every figure is read from the datastore, not from analytics.'
                     )}
                 </p>
+                {!user.loading && (
+                    <p className={styles.subtitle}>{scopeLabel}</p>
+                )}
             </header>
 
             {/* Controls and the report picker are chrome: the print stylesheet
@@ -236,10 +281,10 @@ export const ReportsPage = () => {
                     <SingleSelectField
                         dense
                         label={i18n.t('Report')}
-                        selected={reportId}
+                        selected={definition.id}
                         onChange={({ selected }) => setReportId(selected)}
                     >
-                        {REPORTS.map((r) => (
+                        {reports.map((r) => (
                             <SingleSelectOption
                                 key={r.id}
                                 label={r.name()}
@@ -300,10 +345,12 @@ export const ReportsPage = () => {
                             selected={regionId}
                             onChange={({ selected }) => setRegionId(selected)}
                         >
-                            <SingleSelectOption
-                                label={i18n.t('All regions')}
-                                value=""
-                            />
+                            {!regionFixed && (
+                                <SingleSelectOption
+                                    label={i18n.t('All regions')}
+                                    value=""
+                                />
+                            )}
                             {regions.map(([id, label]) => (
                                 <SingleSelectOption
                                     key={id}

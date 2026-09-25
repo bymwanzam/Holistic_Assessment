@@ -4,6 +4,8 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useAppState } from '../../lib/AppState.jsx'
 import { useAssessmentKeys, useDataStore } from '../../lib/datastore.js'
 import { fmtDateTime } from '../../lib/format.js'
+import { visibleRecords } from '../../lib/useAccessibleOrgUnits.js'
+import { useCurrentUser } from '../../lib/useCurrentUser.js'
 import styles from '../AdminPage.module.css'
 
 const LIMIT = 200
@@ -16,9 +18,10 @@ const LIMIT = 200
 export const AuditTab = () => {
     const { year } = useAppState()
     const store = useDataStore()
+    const user = useCurrentUser()
     const { keys, loading: keysLoading } = useAssessmentKeys()
 
-    const [records, setRecords] = useState([])
+    const [loaded, setLoaded] = useState([])
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState(null)
 
@@ -29,16 +32,16 @@ export const AuditTab = () => {
 
     const load = useCallback(async () => {
         if (!yearKeys.length) {
-            setRecords([])
+            setLoaded([])
             return
         }
         setLoading(true)
         setError(null)
         try {
-            const loaded = await Promise.all(
+            const read = await Promise.all(
                 yearKeys.map((k) => store.read(k.key))
             )
-            setRecords(loaded.filter(Boolean))
+            setLoaded(read.filter(Boolean))
         } catch (e) {
             setError(e)
         } finally {
@@ -49,6 +52,9 @@ export const AuditTab = () => {
     useEffect(() => {
         load()
     }, [load])
+
+    // Below national level, only the user's own region and its districts.
+    const records = useMemo(() => visibleRecords(user, loaded), [user, loaded])
 
     const entries = useMemo(
         () =>

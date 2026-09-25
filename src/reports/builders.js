@@ -677,6 +677,10 @@ const districtPerformance = ({ scored, year, regionId }) => {
  * `needs` names the extra choice a report cannot be built without — which
  * objective, which indicator, which region — so the page can offer exactly that
  * control and nothing else.
+ *
+ * `upTo` is the narrowest user level a report is offered to (1 national, 2
+ * regional). A comparison across regions means nothing to someone who can see
+ * only one, so it is not offered below the level it compares.
  */
 export const REPORTS = [
     {
@@ -686,6 +690,7 @@ export const REPORTS = [
             i18n.t(
                 'High-level overview across all regions — overall scores, rankings and the spread of performance categories.'
             ),
+        upTo: 1,
         build: nationalSummary,
     },
     {
@@ -695,6 +700,7 @@ export const REPORTS = [
             i18n.t(
                 'Regional comparison with rankings, a breakdown by objective and the spread of each objective across regions.'
             ),
+        upTo: 1,
         build: regionalPerformance,
     },
     {
@@ -724,6 +730,7 @@ export const REPORTS = [
             i18n.t(
                 'Regional peer review — who reviewed whom, how far each review got, what was adjusted and what was recommended.'
             ),
+        upTo: 2,
         build: (ctx) => peerReview({ ...ctx, level: LEVEL.REGION }),
     },
     {
@@ -748,5 +755,9 @@ export const REPORTS = [
 ]
 
 export const reportById = (id) => REPORTS.find((r) => r.id === id) || REPORTS[0]
+
+/** The reports offered to a user whose remit is org unit level `scope`. */
+export const reportsForScope = (scope) =>
+    REPORTS.filter((r) => scope <= (r.upTo ?? Infinity))
 
 export { fmtScore }
